@@ -103,8 +103,6 @@ class Account:
             print(f"Error during logout: {e}")
             return False
 
-    def reset_password(self):
-        pass
     def reset_password(self, email):
         try:
             response = self.supabase.auth.reset_password_for_email(email)
@@ -121,12 +119,8 @@ class Account:
                 "password": password
             })
 
-    def authenticate_user(self):
-        pass
             return response.user
 
-    def update_profile(self):
-        pass        except Exception as e:
         except Exception as e:
             print("Login failed:", e)
             return None
