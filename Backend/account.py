@@ -105,9 +105,47 @@ class Account:
 
     def reset_password(self):
         pass
+    def reset_password(self, email):
+        try:
+            response = self.supabase.auth.reset_password_for_email(email)
+            return response
+        except Exception as e:
+            print(f"Password reset failed: {e}")
+            return None
+
+
+    def authenticate_user(self, email, password):
+        try:
+            response = self.supabase.auth.sign_in_with_password({
+                "email": email,
+                "password": password
+            })
 
     def authenticate_user(self):
         pass
+            return response.user
 
     def update_profile(self):
-        pass
+        pass        except Exception as e:
+            print("Login failed:", e)
+            return None
+
+    def update_profile(self, user_id, email=None, first_name=None, last_name=None, phone=None):
+        try:
+            # Update email in Supabase Auth if provided
+            if email:
+                self.supabase.auth.update_user({"email": email})
+
+            # Update profile fields in your database
+            response = self.supabase.table("profiles").update({
+                "email": email,
+                "first_name": first_name,
+                "last_name": last_name,
+                "phone": phone
+            }).eq("id", user_id).execute()
+
+            return response.data
+
+        except Exception as e:
+            print("Profile update failed:", e)
+            return None
