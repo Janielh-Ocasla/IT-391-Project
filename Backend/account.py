@@ -6,7 +6,8 @@ load_dotenv()
 
 class Account:
     """
-    Handles account creation, login, logout, reset password using Supabase 
+    Handles account creation, login, logout, reset password, authenticate user and update profile
+    using Supabase 
     """
 
     def __init__(self):
@@ -103,9 +104,10 @@ class Account:
             print(f"Error during logout: {e}")
             return False
 
-    def reset_password(self):
-        pass
     def reset_password(self, email):
+        """
+        reset user's password to a new password
+        """
         try:
             response = self.supabase.auth.reset_password_for_email(email)
             return response
@@ -113,24 +115,24 @@ class Account:
             print(f"Password reset failed: {e}")
             return None
 
-
     def authenticate_user(self, email, password):
+        """
+        authenticate user information
+        """
         try:
             response = self.supabase.auth.sign_in_with_password({
                 "email": email,
                 "password": password
             })
-
-    def authenticate_user(self):
-        pass
             return response.user
-
-    def update_profile(self):
-        pass        except Exception as e:
+        except Exception as e:
             print("Login failed:", e)
             return None
 
     def update_profile(self, user_id, email=None, first_name=None, last_name=None, phone=None):
+        """
+        user update information 
+        """
         try:
             # Update email in Supabase Auth if provided
             if email:
@@ -143,7 +145,6 @@ class Account:
                 "last_name": last_name,
                 "phone": phone
             }).eq("id", user_id).execute()
-
             return response.data
 
         except Exception as e:
