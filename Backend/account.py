@@ -127,6 +127,7 @@ class Account:
 
     def update_profile(self):
         pass        except Exception as e:
+        except Exception as e:
             print("Login failed:", e)
             return None
 
