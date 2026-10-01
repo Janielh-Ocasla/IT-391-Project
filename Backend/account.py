@@ -117,26 +117,7 @@ class Account:
             return None
 
 
-    def authenticate_user(self, email, password):
-        """
-        authenticate user information
-        """
-        try:
-            response = self.supabase.auth.sign_in_with_password({
-                "email": email,
                 "password": password
-            })
-<<<<<<< HEAD
-
-            return response.user
-
-=======
-            return response.user
->>>>>>> main
-        except Exception as e:
-            print("Login failed:", e)
-            return None
-
     def update_profile(self, user_id, email=None, first_name=None, last_name=None, phone=None):
         """
         user update information 
@@ -153,7 +134,6 @@ class Account:
                 "last_name": last_name,
                 "phone": phone
             }).eq("id", user_id).execute()
-
             return response.data
 
         except Exception as e:
