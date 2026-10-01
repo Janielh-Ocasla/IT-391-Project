@@ -115,20 +115,6 @@ class Account:
             print(f"Password reset failed: {e}")
             return None
 
-    def authenticate_user(self, email, password):
-        """
-        authenticate user information
-        """
-        try:
-            response = self.supabase.auth.sign_in_with_password({
-                "email": email,
-                "password": password
-            })
-            return response.user
-        except Exception as e:
-            print("Login failed:", e)
-            return None
-
     def update_profile(self, user_id, email=None, first_name=None, last_name=None, phone=None):
         """
         user update information 
