@@ -6,8 +6,7 @@ load_dotenv()
 
 class Account:
     """
-    Handles account creation, login, logout, reset password, authenticate user and update profile
-    using Supabase 
+    Handles account creation, login, logout, reset password and update profile using Supabase 
     """
 
     def __init__(self):
