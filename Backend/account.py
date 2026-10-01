@@ -6,7 +6,6 @@ load_dotenv()
 
 class Account:
     """
-    Handles account creation, login, logout, reset password using Supabase 
     Handles account creation, login, logout, reset password, authenticate user and update profile
     using Supabase 
     """
@@ -116,8 +115,6 @@ class Account:
             print(f"Password reset failed: {e}")
             return None
 
-
-                "password": password
     def update_profile(self, user_id, email=None, first_name=None, last_name=None, phone=None):
         """
         user update information 
