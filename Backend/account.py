@@ -18,7 +18,13 @@ class Account:
     def create_account(self, email, password, first_name, last_name, phone):
         """
         Creates a new account
-        Returns True if successful, False otherwise
+
+        :param email: user's email address
+        :param password: user's password
+        :param first_name: user's first name
+        :param last_name: user's last name
+        :param phone: user's phone number
+        :return: True if account created, False otherwise
         """
         try:
             # clean and normalize user inputs
@@ -61,6 +67,10 @@ class Account:
     def login(self, email, password):
         """
         Logs a user in and returns their role so the application knows which dashboard to show
+        
+        :param email: user's email address
+        :param password: user's password
+        :return: True and user's role if login is successful, False and None otherwise
         """
         try:
             # clean and normalize email
@@ -93,6 +103,8 @@ class Account:
     def logout(self):
         """
         Logs out the current user.
+
+        :return: True if logout is successful, False otherwise
         """
         try:
             # end the current session
@@ -106,6 +118,9 @@ class Account:
     def reset_password(self, email):
         """
         sends a password reset link through email
+
+        :param email: user's email address
+        :return: password reset response if successful, None otherwise
         """
         try:
             response = self.supabase.auth.reset_password_for_email(email)
@@ -116,7 +131,14 @@ class Account:
 
     def update_profile(self, user_id, email=None, first_name=None, last_name=None, phone=None):
         """
-        user update information 
+        Updates the user's profile information.
+
+        :param user_id: ID of the user whose profile is being updated
+        :param email: new email address
+        :param first_name: new first name
+        :param last_name: new last name
+        :param phone: new phone number
+        :return: updated profile information if successful, None otherwise
         """
         try:
             # Update email in Supabase Auth if provided
