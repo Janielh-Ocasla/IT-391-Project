@@ -4,9 +4,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-class Assignment:
+class Task:
     """
-    Volunteer taking and finishing a task
+    Managing and viewing tasks
     """
 
     def __init__(self):
@@ -17,8 +17,8 @@ class Assignment:
 
     def is_admin(self, user_id):
         """
-        checks whether the user is admin
-        Used to restrict admin-only actions like verify photo
+        check whether the user is admin
+        Used to restrict admin-only actions like create, edit & delete
         """
         try:
             profile = (
@@ -33,8 +33,20 @@ class Assignment:
             print(f"Role check failed: {e}")
             return False
 
-    def pick_task(self): #Azul
+    def create_task(self): #dariya
         pass
 
-    def cancel_task(self): #Azul
+    def edit_task(self): #dariya
+        pass
+
+    def delete_task(self): #dariya
+        pass
+
+    def task_info(self): #dariya
+        pass
+
+    def list_task(self): #azul
+        """
+        Volunteers see only available tasks, while admin see all tasks.
+        """
         pass

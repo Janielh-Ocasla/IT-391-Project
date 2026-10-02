@@ -105,7 +105,7 @@ class Account:
 
     def reset_password(self, email):
         """
-        reset user's password to a new password
+        sends a password reset link through email
         """
         try:
             response = self.supabase.auth.reset_password_for_email(email)
