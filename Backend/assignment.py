@@ -19,8 +19,12 @@ class Assignment:
         """
         checks whether the user is admin
         Used to restrict admin-only actions like verify photo
+
+        :param user_id: ID of the user to check
+        :return: True if user is an admin, False otherwise
         """
         try:
+            # get the user's role from profiles
             profile = (
                 self.supabase.table("profiles")
                 .select("role")
