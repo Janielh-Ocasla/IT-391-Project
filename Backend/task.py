@@ -169,8 +169,29 @@ class Task:
             print(f"Could not get task information: {e}")
             return None
 
-    def list_task(self): #azul
+    def list_task(self, user_id): 
         """
         Volunteers see only available tasks, while admin see all tasks.
         """
-        pass
+        try:
+            if self.is_admin(user_id):
+                response = (
+                    self.supabase.table("tasks")
+                    .select("*")
+                    .order("created_at", desc=True)
+                    .execute()
+                )
+                return response.data
+            
+            response = (
+                self.supabase.table("tasks")
+                .select("*")
+                .eq("status", "open")
+                .order("created_at", desc=True)
+                .execute()
+            )
+            return response.data
+
+        except Exception as e:
+            print(f"Could not list tasks: {e}")
+            return None

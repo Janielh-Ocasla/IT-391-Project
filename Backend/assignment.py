@@ -37,8 +37,68 @@ class Assignment:
             print(f"Role check failed: {e}")
             return False
 
-    def pick_task(self): #Azul
-        pass
+    def pick_task(self, user_id, task_id): 
+        """
+        Assigns a task to a volunteer.
+        Creates an assignment row and marks the task as in_progress.
+        """
+        try:
+            assignment = (
+                self.supabase.table("assignments")
+                .insert({
+                    "task_id": task_id,
+                    "volunteer_id": user_id,
+                    "status": "assigned"
+                })
+                .execute()
+            )
+            self.supabase.table("tasks") \
+                .update({"status": "in_progress"}) \
+                .eq("id", task_id) \
+                .execute()
 
-    def cancel_task(self): #Azul
-        pass
+            return assignment.data
+
+        except Exception as e:
+            print(f"Task assignment failed: {e}")
+            return None
+
+    def cancel_task(self, user_id, task_id): 
+        """
+        Cancels a volunteer's assignment.
+        Updates assignment status and resets task status.
+        """
+        try:
+            assignment = (
+                self.supabase.table("assignments")
+                .select("*")
+                .eq("task_id", task_id)
+                .eq("volunteer_id", user_id)
+                .single()
+                .execute()
+            )
+
+            if not assignment.data:
+                print("Cancel failed: no assignment found for this user.")
+                return None
+
+            assignment_id = assignment.data["id"]
+
+            self.supabase.table("assignments") \
+                .update({
+                    "status": "cancelled",
+                    "cancelled_at": "now()"
+                }) \
+                .eq("id", assignment_id) \
+                .execute()
+
+            self.supabase.table("tasks") \
+                .update({"status": "available"}) \
+                .eq("id", task_id) \
+                .execute()
+
+            return {"message": "Task cancelled"}
+
+        except Exception as e:
+            print(f"Task cancel failed: {e}")
+            return None
