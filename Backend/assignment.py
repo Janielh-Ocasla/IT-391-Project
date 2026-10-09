@@ -1,4 +1,5 @@
 import os
+from datetime import datetime, timezone
 from supabase import create_client, Client
 from dotenv import load_dotenv
 
@@ -43,6 +44,17 @@ class Assignment:
         Creates an assignment row and marks the task as in_progress.
         """
         try:
+            # make sure the task is still open before picking it
+            task = (
+                self.supabase.table("tasks")
+                .select("status")
+                .eq("id", task_id)
+                .single()
+                .execute()
+            )
+            if task.data["status"] != "open":
+                print("Pick failed: this task is no longer available.")
+                return None
             assignment = (
                 self.supabase.table("assignments")
                 .insert({
@@ -74,7 +86,7 @@ class Assignment:
                 .select("*")
                 .eq("task_id", task_id)
                 .eq("volunteer_id", user_id)
-                .single()
+                .eq("status", "assigned")
                 .execute()
             )
 
@@ -82,18 +94,18 @@ class Assignment:
                 print("Cancel failed: no assignment found for this user.")
                 return None
 
-            assignment_id = assignment.data["id"]
+            assignment_id = assignment.data[0]["id"]
 
             self.supabase.table("assignments") \
                 .update({
                     "status": "cancelled",
-                    "cancelled_at": "now()"
+                    "cancelled_at": datetime.now(timezone.utc).isoformat()
                 }) \
                 .eq("id", assignment_id) \
                 .execute()
 
             self.supabase.table("tasks") \
-                .update({"status": "available"}) \
+                .update({"status": "open"}) \
                 .eq("id", task_id) \
                 .execute()
 
@@ -102,3 +114,29 @@ class Assignment:
         except Exception as e:
             print(f"Task cancel failed: {e}")
             return None
+
+    def upload_photo(self): #Azul
+        """
+        Volunteer uploads the delivery photo as proof.
+        Photo can be retaken until submitted
+        """
+        pass  
+
+    def submit_task(self): #Azul
+        """
+        Volunteer presses submit to say the delivery is done.
+        Only works if a photo was uploaded first.
+        """
+        pass 
+
+    def verify_delivery(self): #Azul
+        """
+        Admin will check the photo and verify whether the task was complete or not
+        """
+        pass
+
+    def track_task_status(self): #Azul
+        """
+        Volunteer can see their own status, while admin can see everyone's.
+        """
+        pass
