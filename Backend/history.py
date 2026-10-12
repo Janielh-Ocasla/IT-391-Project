@@ -44,9 +44,34 @@ class History:
         """
         pass
 
-    def service_history(self): #dariya
+    def service_history(self, user_id, volunteer_id=None):
         """
-        Volunteers see their own completed tasks.
-        Admin can look up any volunteer by passing volunteer_id.
+        Volunteers see their own completed tasks and cancelled tasks.
+        Admin can look up any volunteer by passing volunteer_id,
+        or see everyone's history if no volunteer_id is given.
+
+        :param user_id: ID of the user asking
+        :param volunteer_id: ID of the volunteer to look up for admin only
+        :return: list of assignments with task details, None if something goes wrong
         """
-        pass
+        try:
+            # service history includes both completed and cancelled tasks
+            query = (
+                self.supabase.table("assignments")
+                .select("id, task_id, status, assigned_at, cancelled_at, submitted_at, reviewed_at, "
+                        "tasks(title, description, deleted_at)")
+                .in_("status", ["completed", "cancelled"])
+            )
+            if self.is_admin(user_id):
+                # admin can narrow down to one volunteer
+                if volunteer_id:
+                    query = query.eq("volunteer_id", volunteer_id)
+            else:
+                # volunteers can only see their own history
+                query = query.eq("volunteer_id", user_id)
+            # newest history first
+            response = query.order("assigned_at", desc=True).execute()
+            return response.data
+        except Exception as e:
+            print(f"Could not get service history: {e}")
+            return None
