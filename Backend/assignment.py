@@ -133,6 +133,7 @@ class Assignment:
         """
         Admin will check the photo and verify whether the task was complete or not
         """
+        # NOTE: set status to "completed", since service_history method filters on this word
         pass
 
     def track_task_status(self): #Azul
