@@ -132,7 +132,10 @@ class Task:
             # find and delete the task from database
             response = (
                 self.supabase.table("tasks")
-                .delete()
+                .update({
+                    "deleted_at": datetime.now(timezone.utc).isoformat(),
+                    "deleted_by": user_id
+                })
                 .eq("id", task_id)
                 .execute()
             )
