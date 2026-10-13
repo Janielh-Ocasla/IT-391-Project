@@ -70,7 +70,7 @@ class Account:
         
         :param email: user's email address
         :param password: user's password
-        :return: True and user's role if login is successful, False and None otherwise
+        :return: True, user's role and session if login is successful; False, None and None otherwise
         """
         try:
             # clean and normalize email
@@ -82,7 +82,7 @@ class Account:
             })
             if response.user is None:
                 print("Login failed: Invalid email or password")
-                return False, None
+                return False, None, None
 
             # get the user's role from the profiles table
             profile = (
@@ -94,11 +94,11 @@ class Account:
             )
             role = profile.data["role"]
             print(f"Login successful. Role:{role}")
-            return True, role
+            return True, role, response.session
         
         except Exception as e:
             print(f"Login failed: {e}")
-            return False, None
+            return False, None, None
 
     def logout(self):
         """
