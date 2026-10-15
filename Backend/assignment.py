@@ -48,12 +48,12 @@ class Assignment:
             # make sure the task is still open before picking it
             task = (
                 self.supabase.table("tasks")
-                .select("status")
+                .select("status, deleted_at")
                 .eq("id", task_id)
                 .single()
                 .execute()
             )
-            if task.data["status"] != "open":
+            if task.data["status"] != "open" or task.data["deleted_at"]:
                 print("Pick failed: this task is no longer available.")
                 return None
             assignment = (

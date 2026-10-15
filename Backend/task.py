@@ -119,7 +119,7 @@ class Task:
 
     def delete_task(self, user_id, task_id):
         """
-        Delete a task and can only be deleted by admin.
+        Marks a task as deleted (soft delete) and can only be done by admin.
 
         :param user_id: ID of the admin deleting the task
         :param task_id: ID of the task to delete
@@ -129,7 +129,7 @@ class Task:
             if not self.is_admin(user_id):
                 print("Only admins can delete tasks.")
                 return False
-            # find and delete the task from database
+            # mark the task as deleted 
             response = (
                 self.supabase.table("tasks")
                 .update({
@@ -137,6 +137,7 @@ class Task:
                     "deleted_by": user_id
                 })
                 .eq("id", task_id)
+                .is_("deleted_at", "null")
                 .execute()
             )
             # check if the task was found and deleted
@@ -163,6 +164,7 @@ class Task:
                 self.supabase.table("tasks")
                 .select("*")
                 .eq("id", task_id)
+                .is_("deleted_at", "null")
                 .single()
                 .execute()
             )
@@ -181,6 +183,7 @@ class Task:
                 response = (
                     self.supabase.table("tasks")
                     .select("*")
+                    .is_("deleted_at", "null")
                     .order("created_at", desc=True)
                     .execute()
                 )
@@ -190,6 +193,7 @@ class Task:
                 self.supabase.table("tasks")
                 .select("*")
                 .eq("status", "open")
+                .is_("deleted_at", "null")
                 .order("created_at", desc=True)
                 .execute()
             )
