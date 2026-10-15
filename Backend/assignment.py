@@ -1,4 +1,5 @@
 import os
+import mimetypes
 from datetime import datetime, timezone
 from supabase import create_client, Client
 from dotenv import load_dotenv
@@ -115,29 +116,186 @@ class Assignment:
             print(f"Task cancel failed: {e}")
             return None
 
-    def upload_photo(self): #Azul
+    def upload_photo(self, user_id, task_id, file_path):
         """
         Volunteer uploads the delivery photo as proof.
         Photo can be retaken until submitted
         """
-        pass  
+        #NOTE: only one photo is allowed per assignment, so if the volunteer uploads a new photo, it will overwrite the previous one
+        
+        try:
+        # Find the volunteer's active assignment
+            assignment = (
+                self.supabase.table("assignments")
+                .select("id, status")
+                .eq("task_id", task_id)
+                .eq("volunteer_id", user_id)
+                .eq("status", "assigned")
+                .single()
+                .execute()
+            )
 
-    def submit_task(self): #Azul
+            assignment_id = assignment.data["id"]
+
+            # Get the photo's file name and type
+            file_name = os.path.basename(file_path)
+            content_type = (
+                mimetypes.guess_type(file_name)[0]
+                or "application/octet-stream"
+            )
+
+            # Create a unique path for the photo to not overwrite previous uploads
+            timestamp = datetime.now(timezone.utc).strftime(
+                "%Y%m%d%H%M%S%f"
+            )
+            
+            #store the photo in a folder named after the user and assignment, with a timestamp to avoid overwriting
+            photo_path = (
+                f"{user_id}/{assignment_id}/"
+                f"{timestamp}_{file_name}"
+            )
+
+            # Upload the photo to Supabase Storage
+            with open(file_path, "rb") as photo:
+                self.supabase.storage.from_("task-photo").upload(
+                    path=photo_path,
+                    file=photo,
+                    file_options={"content-type": content_type}
+                )
+
+            # Save the photo path in the assignment
+            self.supabase.table("assignments").update({
+                "photo_path": photo_path
+            }).eq("id", assignment_id).execute()
+
+            return photo_path
+
+        except Exception as e:
+            print(f"Photo upload failed: {e}")
+            return None
+
+    def submit_task(self, user_id, task_id):
         """
         Volunteer presses submit to say the delivery is done.
         Only works if a photo was uploaded first.
         """
-        pass 
+        try:
+            # Find the volunteer's active assignment
+            assignment = (
+                self.supabase.table("assignments")
+                .select("id, photo_path")
+                .eq("task_id", task_id)
+                .eq("volunteer_id", user_id)
+                .eq("status", "assigned")
+                .single()
+                .execute()
+            )
 
-    def verify_delivery(self): #Azul
+            # Check that a photo was uploaded
+            if not assignment.data["photo_path"]:
+                print("Submit failed: upload a photo first.")
+                return None
+
+            # Update the assignment status to submitted and record the submission time
+            result = (
+                self.supabase.table("assignments")
+                .update({
+                    "status": "submitted",
+                    "submitted_at": datetime.now(
+                        timezone.utc
+                    ).isoformat()
+                })
+                .eq("id", assignment.data["id"])
+                .execute()
+            )
+            # Return the updated assignment data
+            return result.data
+
+        except Exception as e:
+            print(f"Task submission failed: {e}")
+            return None
+ 
+
+    def verify_delivery(self, admin_id, assignment_id, approved):
         """
         Admin will check the photo and verify whether the task was complete or not
         """
         # NOTE: set status to "completed", since service_history method filters on this word
-        pass
+        try:
+            # Check if the user is an admin for verification
+            if not self.is_admin(admin_id):
+                print("Verification failed: admin access required.")
+                return None
 
-    def track_task_status(self): #Azul
+            # Check if the assignment is in submitted status
+            assignment = (
+                #find the assignment using its ID and get the details
+                self.supabase.table("assignments")
+                .select("id, task_id, status")
+                .eq("id", assignment_id)
+                .eq("status", "submitted")
+                .single()
+                .execute()
+            )
+
+            task_id = assignment.data["task_id"]
+
+            if approved:
+                # Admin marks the task as completed
+                new_status = "completed"
+            else:
+                # Rejected tasks are sent back to assigned for volunteer to resubmit
+                new_status = "assigned"
+            
+            # update the status, who reviewed it, and the review timestamp
+            result = (
+                self.supabase.table("assignments")
+                .update({
+                    "status": new_status,
+                    "reviewed_by": admin_id,
+                    "reviewed_at": datetime.now(
+                        timezone.utc
+                    ).isoformat(),
+                    "submitted_at": None if not approved else
+                        datetime.now(timezone.utc).isoformat()
+                })
+                .eq("id", assignment_id)
+                .execute()
+            )
+
+            # Mark the task completed only when approved
+            if approved:
+                self.supabase.table("tasks").update({
+                    "status": "completed"
+                }).eq("id", task_id).execute()
+
+            return result.data
+
+        except Exception as e:
+            print(f"Delivery verification failed: {e}")
+            return None
+
+    def track_task_status(self, user_id):
         """
         Volunteer can see their own status, while admin can see everyone's.
         """
-        pass
+        try:
+            # check if the user is an admin
+            admin = self.is_admin(user_id)
+
+            query = (
+                #see all assignments with task details (title and status)
+                self.supabase.table("assignments")
+                .select("*, tasks(title, status)")
+            )
+
+            # volunteers can only see their own assignments
+            if not admin:
+                query = query.eq("volunteer_id", user_id)
+
+            result = query.execute()
+            return result.data
+
+        except Exception as e:
+            print(f"Task status lookup failed: {e}")
+            return None

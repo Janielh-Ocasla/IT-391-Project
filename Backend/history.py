@@ -37,12 +37,55 @@ class History:
             print(f"Role check failed: {e}")
             return False
 
-    def track_volunteer_hours(self): #Azul
+    def track_volunteer_hours(self, user_id, volunteer_id=None):
         """
         Volunteers see their own total hours.
         Admin can look up any volunteer's total hours.
         """
+        #NOTE: supabase needs to update tasks to add hours to the tasks table, so we can get the hours from there
         pass
+    
+        """
+        try:
+            # Check if the user is an admin
+            admin = self.is_admin(user_id)
+
+            # Volunteers can only view their own hours
+            if not admin:
+                volunteer_id = user_id
+            elif volunteer_id is None:
+                # Admin must look up a specific volunteer, so volunteer_id is required
+                print("Please provide a volunteer ID.")
+                return None
+
+            # Get completed assignments for this volunteer including the task hours
+            result = (
+                self.supabase.table("assignments")
+                .select("task_id, tasks(hours)")
+                .eq("volunteer_id", volunteer_id)
+                .eq("status", "completed")
+                .execute()
+            )
+
+            # Add the hours for each completed task
+            total_hours = 0
+
+            for assignment in result.data:
+                task = assignment.get("tasks")
+
+                if task:
+                    total_hours += float(task.get("hours") or 0)
+
+            return {
+                "volunteer_id": volunteer_id,
+                "total_hours": round(total_hours, 2)
+            }
+
+        except Exception as e:
+            print(f"Volunteer hours lookup failed: {e}")
+            return None
+        """
+
 
     def service_history(self, user_id, volunteer_id=None):
         """
