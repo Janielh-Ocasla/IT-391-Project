@@ -42,10 +42,6 @@ class History:
         Volunteers see their own total hours.
         Admin can look up any volunteer's total hours.
         """
-        #NOTE: supabase needs to update tasks to add hours to the tasks table, so we can get the hours from there
-        pass
-    
-        """
         try:
             # Check if the user is an admin
             admin = self.is_admin(user_id)
@@ -61,7 +57,7 @@ class History:
             # Get completed assignments for this volunteer including the task hours
             result = (
                 self.supabase.table("assignments")
-                .select("task_id, tasks(hours)")
+                .select("task_id, tasks(estimated_hours)")
                 .eq("volunteer_id", volunteer_id)
                 .eq("status", "completed")
                 .execute()
@@ -74,7 +70,7 @@ class History:
                 task = assignment.get("tasks")
 
                 if task:
-                    total_hours += float(task.get("hours") or 0)
+                    total_hours += float(task.get("estimated_hours") or 0)
 
             return {
                 "volunteer_id": volunteer_id,
@@ -84,7 +80,6 @@ class History:
         except Exception as e:
             print(f"Volunteer hours lookup failed: {e}")
             return None
-        """
 
 
     def service_history(self, user_id, volunteer_id=None):
