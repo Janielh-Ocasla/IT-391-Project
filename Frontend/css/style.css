@@ -1,1 +1,166 @@
+/* Reset default styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    color: #00155c;
+}
+
+body {
+    font-family: Arial, sans-serif;
+}
+
+/* --- SCROLLING NAVBAR STYLE --- */
+.header {
+    position: fixed;       /* Keeps the navbar fixed at the top of the viewport */
+    top: 0;
+    left: 0;
+    width: 100%;           /* Spans full screen width */
+    height: 120px;
+    background-color: #ffffff;
+    z-index: 1000;         /* Ensures it stays above background content */
+    border-bottom: 2px solid #00155c;
+}
+
+.logo-container {
+    position: absolute;
+    top: 10px;
+    left: 40px;
+}
+
+.logo {
+    height: 100px;
+    width: auto;
+    display: block;
+}
+
+.nav-links {
+    padding-top: 40px;
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+.nav-links li {
+    margin-left: 20px;
+}
+
+.tab:hover {
+    background: linear-gradient(
+        to top,
+        #00155C,
+        #ffffff
+    );
+}
+
+.divider {
+    font-size: 25px;
+}
+
+.nav-links a {
+    text-decoration: none; /* Removes underline */
+    font-size: 18px;
+    transition: color 0.3s;
+}
+
+.nav-links a:hover {
+    color: #04AA6D;        /* Highlight color on hover */
+}
+
+/*
+#login-button {
+    position: absolute;
+    right: 40px;
+}*/
+#login-button {
+    position: absolute;
+    top: 50%;
+    right: 40px;
+    transform: translateY(-50%);
+
+    padding: 10px 24px;
+    background-color: #00155c;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#login-button:hover {
+    background-color: #04AA6D;
+}
+
+/* Modified Overlay: Starts completely transparent and hidden */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  
+  /* Smooth transition rules */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+/* Modified Login Box: Starts slightly smaller for a pop effect */
+.login-box {
+  background-color: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 12px;
+  padding: 40px;
+  width: 320px;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  color: #fff;
+  position: relative;
+
+  /* Scale transition */
+  transform: scale(0.8);
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Slight bounce */
+}
+
+/* Active Class: Triggered by JavaScript to fade everything in */
+.overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Scales the form to normal size when active */
+.overlay.active .login-box {
+  transform: scale(1);
+}
+
+
+main {
+    /* CRITICAL: Because position:fixed removes the navbar from the normal document flow, 
+       add top padding equal to the navbar's height so your content isn't hidden behind it! */
+    padding-top: 100px; 
+}
+
+section {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+}
+
+section img {
+    max-width: 100%;
+    height: auto;
+}
 
