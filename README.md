@@ -23,11 +23,16 @@ Step 1: Create a virtual environment (recommended)
 ``` 
 python -m venv venv
 ```
+On macOS, use python3 if python is not working.
 
 Step 2: Activate the virtual environment
 ```
 On macOS/Linux: source venv/bin/activate
+```
+```
 On Windows (PowerShell): venv\Scripts\Activate.ps1
+```
+```
 On Windows (Command Prompt): venv\Scripts\activate.bat
 ```
 
@@ -51,6 +56,6 @@ pip install supabase
 Done! 
 
 # How to Run
-Run this in your terminal: python application/main.py
+Run this in your terminal: python backend/main.py
 
-Then open your browser and navigate to http://127.0.0.1:5000 
+Then open your browser and navigate to http://127.0.0.1:5050
