@@ -16,7 +16,7 @@ NEVER commit .env as it holds your keys!
 - Supabase 
 - python-dotenv 
 
-# How to Get Set Up
+# How to Set Up
 Install VS Code: https://code.visualstudio.com/
 
 Step 1: Create a virtual environment (recommended)
