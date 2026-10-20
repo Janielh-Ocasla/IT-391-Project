@@ -1,0 +1,232 @@
+/* =====================================================
+   Shared styles: header, buttons and the login popup.
+   Every page links to this file.
+   ===================================================== */
+
+/* ===== Brand colors: swap these for CIC's exact palette ===== */
+:root {
+  --accent: #1f5fae;
+  --accent-dark: #174a8a;
+  --accent-soft: #e8f0fa;
+  --text: #1a1a1a;
+  --muted: #5f5f5f;
+  --border: #cdcdcd;
+  --focus: #0074e8;
+  --panel: #eef3f9;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color: var(--text);
+  background: #fff;
+}
+
+img { max-width: 100%; }
+
+/* ---------- Site header ---------- */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 10px 24px;
+  background: #fff;
+  border-bottom: 1px solid #eee;
+}
+.navbar img.site-logo { height: 52px; width: auto; display: block; }
+.navbar nav { display: flex; gap: 22px; flex: 1; flex-wrap: wrap; }
+.navbar nav a {
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 500;
+  padding: 4px 0;
+  border-bottom: 2px solid transparent;
+}
+.navbar nav a:hover { color: var(--accent); }
+.navbar nav a.active { border-bottom-color: var(--accent); color: var(--accent); }
+
+.btn {
+  display: inline-block;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  border: none;
+  border-radius: 24px;
+  padding: 12px 22px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent-dark); }
+.btn-light { background: #fff; color: var(--accent-dark); }
+.btn-light:hover { background: var(--accent-soft); }
+.btn-outline { background: transparent; color: #fff; border: 2px solid #fff; padding: 10px 20px; }
+.btn-outline:hover { background: rgba(255, 255, 255, 0.15); }
+.btn:disabled { opacity: 0.6; cursor: default; }
+
+@media (max-width: 700px) {
+  .navbar { flex-wrap: wrap; gap: 10px 16px; padding: 10px 16px; }
+  .navbar nav { order: 3; width: 100%; gap: 16px; flex-wrap: nowrap; overflow-x: auto; }
+  .navbar nav a { white-space: nowrap; }
+  .navbar .btn { margin-left: auto; padding: 10px 16px; }
+}
+
+/* ---------- Login popup ---------- */
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(3px);
+  z-index: 1000;
+}
+.overlay.open { display: flex; }
+
+.modal {
+  position: relative;
+  display: flex;
+  width: 100%;
+  max-width: 820px;
+  max-height: 95vh;
+  overflow: auto;
+  background: #fff;
+  border-radius: 32px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  animation: pop 0.2s ease-out;
+}
+@keyframes pop {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.modal-main { flex: 1; padding: 28px 24px; min-width: 0; }
+.modal-side {
+  flex: 1;
+  background: var(--panel);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 32px 28px;
+  gap: 18px;
+}
+.modal-side img { width: 80%; max-width: 260px; height: auto; }
+.modal-side h3 { margin: 0; font-size: 1.15rem; line-height: 1.4; }
+.perks { list-style: none; padding: 0; margin: 0; color: var(--muted); font-size: 0.9rem; line-height: 1.8; }
+
+.close {
+  position: absolute;
+  top: 18px;
+  right: 20px;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  border-radius: 50%;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 2;
+}
+.close:hover { background: rgba(0, 0, 0, 0.08); }
+
+.modal-logo { height: 48px; width: auto; margin-bottom: 12px; display: block; }
+
+.modal h2 { margin: 0 0 4px; font-size: 1.5rem; }
+.sub { margin: 0 0 18px; color: var(--muted); font-size: 0.9rem; }
+
+/* Log in / Create account / Forgot password views */
+.view { display: none; }
+.view.active { display: block; }
+
+.row { display: flex; gap: 10px; }
+.row .field { flex: 1; min-width: 0; }
+
+.field { margin-bottom: 10px; position: relative; }
+.field input {
+  width: 100%;
+  height: 48px;
+  padding: 0 44px 0 14px;
+  font: inherit;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  outline: none;
+}
+.field input:focus { border-color: var(--focus); box-shadow: 0 0 0 2px rgba(0, 116, 232, 0.25); }
+
+.toggle-pw {
+  position: absolute;
+  right: 8px;
+  top: 8px;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 1rem;
+  border-radius: 50%;
+}
+.toggle-pw:hover { background: rgba(0, 0, 0, 0.06); }
+
+.link {
+  display: inline-block;
+  border: none;
+  background: none;
+  padding: 0;
+  font: inherit;
+  font-size: 0.85rem;
+  color: var(--focus);
+  cursor: pointer;
+  text-decoration: none;
+}
+.link:hover { text-decoration: underline; }
+.link.bold { color: var(--text); font-weight: 600; font-size: 0.9rem; text-decoration: underline; }
+.forgot { margin: 2px 0 14px; }
+
+.full { width: 100%; height: 48px; }
+.divider { text-align: center; font-size: 0.75rem; font-weight: 600; margin: 10px 0; }
+
+.social {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  height: 48px;
+  margin-bottom: 10px;
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.95rem;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  cursor: pointer;
+}
+.social:hover { background: #f7f7f7; }
+.social .ico { font-weight: 800; font-size: 1.05rem; }
+.ico.g { color: #4285f4; }
+.ico.f { color: #1877f2; }
+
+.switch-line { margin: 14px 0 0; font-size: 0.9rem; }
+.legal { margin-top: 16px; font-size: 0.7rem; color: var(--muted); }
+.legal a { color: var(--muted); }
+
+.msg { font-size: 0.85rem; margin: 0 0 10px; min-height: 1.2em; }
+.msg.error { color: #c00; }
+.msg.ok { color: #1a7f37; }
+
+@media (max-width: 700px) {
+  .modal-side { display: none; }
+  .modal { border-radius: 24px; max-width: 420px; }
+}
