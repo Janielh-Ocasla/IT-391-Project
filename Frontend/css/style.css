@@ -12,13 +12,13 @@ body {
 
 /* --- SCROLLING NAVBAR STYLE --- */
 .header {
-    position: fixed;       /* Keeps the navbar fixed at the top of the viewport */
+    position: fixed;
     top: 0;
     left: 0;
-    width: 100%;           /* Spans full screen width */
+    width: 100%;         
     height: 120px;
     background-color: #ffffff;
-    z-index: 1000;         /* Ensures it stays above background content */
+    z-index: 1000;
     border-bottom: 2px solid #00155c;
 }
 
@@ -47,33 +47,50 @@ body {
     margin-left: 20px;
 }
 
-.tab:hover {
-    background: linear-gradient(
+.header-box.current-page a {
+    text-decoration: underline;
+}
+
+.header-box {
+    height: 80px;
+    position: relative;
+    z-index: 1;
+}
+
+.header-box:not(.current-page)::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    background:  linear-gradient(
         to top,
-        #00155C,
-        #ffffff
+        #33447D 0%,
+        #8F9BBC 40%,
+        #FFFFFF 100%
     );
+
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    z-index: -1;
+}
+
+.header-box:hover::before {
+    opacity: 0.7;
 }
 
 .divider {
-    font-size: 25px;
+    font-size: 50px;
+    transform: translateY(-15px);
 }
 
 .nav-links a {
     text-decoration: none; /* Removes underline */
-    font-size: 18px;
+    font-size: 50px;
     transition: color 0.3s;
 }
-
-.nav-links a:hover {
-    color: #04AA6D;        /* Highlight color on hover */
-}
-
-/*
-#login-button {
-    position: absolute;
-    right: 40px;
-}*/
 #login-button {
     position: absolute;
     top: 50%;
@@ -91,7 +108,7 @@ body {
 }
 
 #login-button:hover {
-    background-color: #04AA6D;
+    background-color: #4969c2;
 }
 
 /* Modified Overlay: Starts completely transparent and hidden */
@@ -116,8 +133,7 @@ body {
 
 /* Modified Login Box: Starts slightly smaller for a pop effect */
 .login-box {
-  background-color: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  background-color: rgba(255, 255, 255, 1);
   border-radius: 12px;
   padding: 40px;
   width: 320px;
@@ -142,15 +158,59 @@ body {
   transform: scale(1);
 }
 
+.overlay form {
+    display: flex;
+    flex-direction: column;
+}
 
 main {
-    /* CRITICAL: Because position:fixed removes the navbar from the normal document flow, 
-       add top padding equal to the navbar's height so your content isn't hidden behind it! */
-    padding-top: 100px; 
+    padding-top: 120px; 
 }
 
 section {
-    height: 100vh;
+    padding-top: 60px;
+}
+
+#cic-overview {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.overview {
+    background-color: rgb(189, 189, 189);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 100%;
+    padding: 30px;
+    gap: 30px;
+}
+
+section:not(#wip) div.overview-paragraph:not(#wip) {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: justify;
+
+    flex: 1;
+    min-width: 0;
+    gap: 20px;
+}
+
+section:not(#wip) img {
+    flex: 1;
+    min-width: 0;
+    width: 50%;
+    height: auto;
+    max-width: 50%;
+    object-fit: contain;
+    border-radius: 10px;
+}
+
+section#wip{
+    height: 80vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -159,8 +219,8 @@ section {
     gap: 10px;
 }
 
-section img {
-    max-width: 100%;
+section#wip img{
+    background-color: rgb(189, 189, 189);
+    width: 50vh;
     height: auto;
 }
-
