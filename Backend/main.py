@@ -14,7 +14,7 @@ load_dotenv(
 # Import existing backend modules
 from task import Task
 from account import Account
-from announement import Announcement
+from Backend.announcement import Announcement
 from assignment import Assignment
 
 app = Flask(__name__)
