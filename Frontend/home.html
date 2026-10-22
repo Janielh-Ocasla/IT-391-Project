@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!--Header-->
+    <nav class="header">
+        <div class="logo-container">
+            <a href="home.html">
+                <img src="images/Logo.png" alt="Community Innovation Center Logo" class="logo">
+            </a>
+        </div>
+        <ul class="nav-links">
+            <li>
+                <div class="header-box current-page">
+                    <a>Home</a>
+                </div>
+            </li>
+            <li class="divider">|</li>
+            <li>
+                <div class="header-box">
+                    <a href="about.html">About</a>
+                </div>
+            </li>
+            <li class="divider">|</li>
+            <li>
+                <div class="header-box">
+                    <a href="donate.html">Donate</a>
+                </div>
+            </li>
+            <li class="divider">|</li>
+            <li>
+                <div class="header-box">
+                    <a href="volunteer.html">Volunteer</a>
+                </div>
+            </li>
+        </ul>
+
+        <!--Login/Signup-->
+        <button id="login-button">Login / Sign Up</button>
+
+        <div id="login-overlay" class="overlay">
+            <div class="login-box">
+                <button id="close-login" class="close-button">&times;</button>
+                <h2>Account Login</h2>
+                <form>
+                    <input type="text" placeholder="Username" required>
+                    <input type="password" placeholder="Password" required>
+                    <button type="submit" class="submit-btn">Sign In</button>
+                </form>
+            </div> 
+        </div>
+
+    </nav>
+
+    <main>
+        <!--Company Overview-->
+        <section id="cic-overview">
+            <h1>Together we can connect hearts, transform lives, and foster a sense of belonging for everyone.</h1>
+            <div class="overview">
+                <div class="overview-paragraph">
+                    <p>The Community Innovation Center (CIC) is a nonprofit organization dedicated to empowering individuals 
+                        and transforming communities through innovative solutions. Based on the southwest side of Chicago, we 
+                        focus on fostering growth and creating opportunities by addressing key areas such as <b>entrepreneurship, 
+                        civic engagement, wellness, technology, food insecurity, and the arts.</b> Our programs are designed to equip individuals, businesses,
+                        and organizations with the tools they need to succeed while promoting collaboration and inclusivity.
+                    </p>
+                    <p>At CIC, we believe that innovation is the key to sustainable progress. By connecting passionate people with resources and ideas,
+                        we aim to tackle pressing challenges and inspire positive change. From supporting local entrepreneurs to bridging the digital divide,
+                        our initiatives are rooted in a commitment to building stronger, healthier, and more vibrant communities.
+                    </p>
+                </div>
+                <img src="images/Overview.jpg" alt="Overview Image">
+            </div>
+        </section>
+
+        <!--Scrollable Events section-->
+        <section id="recent-events">
+            <h1>Recent Events</h1>
+            <div class="scroll-box">
+                <article>
+                    <h3>Article Title 1</h3>
+                    <p>Summary or text of the first article goes here.</p>
+                </article>
+  
+                <article>
+                    <h3>Article Title 2</h3>
+                    <p>Summary or text of the second article goes here.</p>
+                </article>
+
+                <article>
+                    <h3>Article Title 3</h3>
+                    <p>Summary or text of the third article goes here.</p>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
