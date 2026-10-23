@@ -141,17 +141,27 @@ class Account:
         :return: updated profile information if successful, None otherwise
         """
         try:
+            updates = {
+                field: value
+                for field, value in {
+                    "email": email,
+                    "first_name": first_name,
+                    "last_name": last_name,
+                    "phone": phone,
+                }.items()
+                if value is not None
+            }
+            if not updates:
+                return None
+
             # Update email in Supabase Auth if provided
             if email:
                 self.supabase.auth.update_user({"email": email})
 
             # Update profile fields in your database
-            response = self.supabase.table("profiles").update({
-                "email": email,
-                "first_name": first_name,
-                "last_name": last_name,
-                "phone": phone
-            }).eq("id", user_id).execute()
+            response = self.supabase.table("profiles").update(
+                updates
+            ).eq("id", user_id).execute()
             return response.data
 
         except Exception as e:

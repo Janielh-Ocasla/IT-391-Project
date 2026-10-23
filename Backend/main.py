@@ -781,6 +781,20 @@ def upload_photo_api(task_id):
         }), 400
 
     try:
+        # A missing/finished assignment is a client-side workflow conflict,
+        # rather than a Storage failure. RLS and the user ID scope this lookup.
+        active = (
+            manager.supabase.table("assignments")
+            .select("id")
+            .eq("task_id", task_id)
+            .eq("volunteer_id", user_id)
+            .eq("status", "assigned")
+            .limit(1)
+            .execute()
+        )
+        if not active.data:
+            return jsonify({"error": "An active assignment is required to upload a photo"}), 409
+
         # Temporarily save the uploaded photo
         with TemporaryDirectory() as temp_dir:
             file_path = Path(temp_dir) / filename

@@ -1,0 +1,22 @@
+{
+  "notice": "FICTIONAL OFFLINE DATA ONLY. These are not real Supabase accounts or credentials.",
+  "accounts": [
+    {"id": "10000000-0000-4000-8000-000000000001", "email": "admin@cic-mock.example", "password": "MockOnly!2026", "first_name": "Mock", "last_name": "Admin", "phone": "", "role": "admin"},
+    {"id": "10000000-0000-4000-8000-000000000002", "email": "alice@cic-mock.example", "password": "MockOnly!2026", "first_name": "Alice", "last_name": "Volunteer", "phone": "", "role": "volunteer"},
+    {"id": "10000000-0000-4000-8000-000000000003", "email": "bob@cic-mock.example", "password": "MockOnly!2026", "first_name": "Bob", "last_name": "Volunteer", "phone": "", "role": "volunteer"}
+  ],
+  "tasks": [
+    {"id": "20000000-0000-4000-8000-000000000001", "title": "[MOCK CIC] Pantry delivery", "description": "Fictional delivery for the approval workflow.", "status": "open", "estimated_hours": 2.5},
+    {"id": "20000000-0000-4000-8000-000000000002", "title": "[MOCK CIC] Donation sorting", "description": "Fictional task for cancellation and reassignment.", "status": "open", "estimated_hours": 1},
+    {"id": "20000000-0000-4000-8000-000000000003", "title": "[MOCK CIC] Event setup", "description": "Already assigned to Bob.", "status": "in_progress", "estimated_hours": 3},
+    {"id": "20000000-0000-4000-8000-000000000004", "title": "[MOCK CIC] Prior delivery", "description": "Alice completed this fictional task.", "status": "completed", "estimated_hours": 1.5},
+    {"id": "20000000-0000-4000-8000-000000000005", "title": "[MOCK CIC] Deleted task", "description": "Must not appear in task lists.", "status": "open", "estimated_hours": 1, "deleted_at": "2026-10-21T12:00:00+00:00"}
+  ],
+  "assignments": [
+    {"id": "30000000-0000-4000-8000-000000000001", "task_id": "20000000-0000-4000-8000-000000000003", "volunteer_id": "10000000-0000-4000-8000-000000000003", "status": "assigned"},
+    {"id": "30000000-0000-4000-8000-000000000002", "task_id": "20000000-0000-4000-8000-000000000004", "volunteer_id": "10000000-0000-4000-8000-000000000002", "status": "completed", "reviewed_by": "10000000-0000-4000-8000-000000000001"}
+  ],
+  "announcements": [
+    {"announcement_id": "40000000-0000-4000-8000-000000000001", "title": "[MOCK CIC] Orientation", "content": "Fictional announcement visible to both roles."}
+  ]
+}

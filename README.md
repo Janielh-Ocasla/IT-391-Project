@@ -71,3 +71,15 @@ node --test tests/api-client.test.cjs
 ```
 
 Node.js is only needed for the browser-client tests, not to run the application.
+
+To run the stateful Volunteer/Admin mock workflows and regenerate a readable
+report with per-scenario evidence:
+
+```sh
+python -m scripts.verify_mock_roles
+```
+
+See [docs/MOCK_VERIFICATION.md](docs/MOCK_VERIFICATION.md) for results, including
+blocked registration and business methods that do not yet have API routes.
+The mock uses fictional data from `tests/fixtures/role_scenarios.json`, runs the
+real business classes, and blocks all network connections during each scenario.
