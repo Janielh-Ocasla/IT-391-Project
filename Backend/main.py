@@ -3,8 +3,9 @@ from pathlib import Path
 from uuid import UUID
 from tempfile import TemporaryDirectory
 from werkzeug.utils import secure_filename
+from werkzeug.exceptions import HTTPException
 from dotenv import load_dotenv
-from flask import Flask, jsonify, request
+from flask import Flask, abort, jsonify, render_template, request
 
 # Load project environment variables
 load_dotenv(
@@ -12,13 +13,66 @@ load_dotenv(
 )
 
 # Import existing backend modules
-from task import Task
-from account import Account
-from Backend.announcement import Announcement
-from assignment import Assignment
+if __package__:
+    from .task import Task
+    from .account import Account
+    from .announcement import Announcement
+    from .assignment import Assignment
+else:
+    from task import Task
+    from account import Account
+    from announcement import Announcement
+    from assignment import Assignment
 
-app = Flask(__name__)
+SITE_DIR = Path(__file__).resolve().parent.parent / "Frontend" / "cic-site"
+app = Flask(
+    __name__,
+    template_folder=str(SITE_DIR / "templates"),
+    static_folder=str(SITE_DIR / "static"),
+    static_url_path="/static",
+)
 app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024
+
+
+def bearer_token():
+    scheme, _, token = request.headers.get("Authorization", "").partition(" ")
+    return token.strip() if scheme.lower() == "bearer" else ""
+
+
+@app.before_request
+def require_api_token():
+    # Reject missing credentials before constructing a Supabase client.
+    public_endpoints = {"health", "login", "register", "current_user", "logout", "reset_password"}
+    if (
+        request.path.startswith("/api/")
+        and request.endpoint is not None
+        and request.endpoint not in public_endpoints
+        and request.method != "OPTIONS"
+        and not bearer_token()
+    ):
+        return jsonify({"error": "Unauthorized"}), 401
+
+
+@app.after_request
+def normalize_api_response(response):
+    if request.path.startswith("/api/"):
+        if response.is_json:
+            data = response.get_json()
+            if isinstance(data, dict):
+                data["ok"] = response.status_code < 400
+                response.set_data(app.json.dumps(data))
+        response.headers["Cache-Control"] = "no-store"
+    return response
+
+
+@app.errorhandler(HTTPException)
+def api_http_error(error):
+    response = error.get_response()
+    if request.path.startswith("/api/"):
+        # Preserve HTTP headers such as Allow on 405 responses.
+        response.set_data(app.json.dumps({"ok": False, "error": error.description}))
+        response.content_type = "application/json"
+    return response
 
 # ==================================================
 # SHARED AUTHENTICATION
@@ -38,14 +92,7 @@ def authenticate(manager, required_role=None):
         (None, error_response) on failure
     """
 
-    authorization = request.headers.get("Authorization", "")
-
-    if not authorization.startswith("Bearer "):
-        return None, (
-            jsonify({"error": "Unauthorized"}), 401
-        )
-
-    token = authorization[7:].strip()
+    token = bearer_token()
 
     if not token:
         return None, (
@@ -63,7 +110,9 @@ def authenticate(manager, required_role=None):
 
         user_id = str(response.user.id)
 
-        # Use this user's JWT for database RLS
+        # Each route creates a fresh manager. Bind both database requests and
+        # the lazily created Storage client to this user's JWT for RLS.
+        manager.supabase.options.headers["Authorization"] = f"Bearer {token}"
         manager.supabase.postgrest.auth(token)
 
     except Exception:
@@ -121,7 +170,26 @@ def valid_uuid(value):
 # ==================================================
 
 @app.route("/", methods=["GET"])
+@app.route("/index.html", methods=["GET"])
+@app.route("/home.html", methods=["GET"])
 def home():
+    return render_template("home.html")
+
+
+@app.route("/about", methods=["GET"])
+def about():
+    return render_template("about.html")
+
+
+@app.route("/<name>.html", methods=["GET"])
+def page(name):
+    if name not in {"about", "donate", "volunteer"}:
+        abort(404)
+    return render_template(f"{name}.html")
+
+
+@app.route("/api/health", methods=["GET"])
+def health():
     return jsonify({
         "message": "IT391 Backend is running!"
     }), 200
@@ -171,6 +239,7 @@ def login():
 # ==================================================
 
 @app.route("/api/register", methods=["POST"])
+@app.route("/api/signup", methods=["POST"])
 def register():
     """
     Registration is temporarily paused until CIC's
@@ -212,6 +281,63 @@ def register():
             "pending Auth/Profile setup"
         )
     }), 503
+
+
+@app.route("/api/me", methods=["GET"])
+def current_user():
+    if "Authorization" not in request.headers:
+        return jsonify({"logged_in": False}), 200
+
+    if not bearer_token():
+        return jsonify({"error": "Unauthorized"}), 401
+
+    manager = Account()
+    user_id, error = authenticate(manager)
+    if error is not None:
+        return error
+
+    try:
+        profile = (
+            manager.supabase.table("profiles")
+            .select("role")
+            .eq("id", user_id)
+            .single()
+            .execute()
+        )
+        if not profile.data or profile.data.get("role") not in {"admin", "volunteer"}:
+            return jsonify({"error": "Account profile is unavailable"}), 403
+        return jsonify({
+            "logged_in": True,
+            "user_id": user_id,
+            "role": profile.data["role"],
+        }), 200
+    except Exception:
+        app.logger.exception("Failed to retrieve current user profile")
+        return jsonify({"error": "Failed to retrieve profile"}), 500
+
+
+@app.route("/api/logout", methods=["POST"])
+def logout():
+    # Access tokens are owned by the caller. The shared browser client clears
+    # sessionStorage; this endpoint does not revoke an already issued JWT.
+    return jsonify({"message": "Clear the client access token to complete logout"}), 200
+
+
+@app.route("/api/reset-password", methods=["POST"])
+def reset_password():
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify({"error": "Invalid JSON body"}), 400
+    email = data.get("email")
+    if not isinstance(email, str) or not email.strip():
+        return jsonify({"error": "Email is required"}), 400
+
+    try:
+        Account().reset_password(email.strip())
+    except Exception:
+        app.logger.exception("Password reset request failed")
+    # Do not disclose whether an email address has an account.
+    return jsonify({"message": "If the account exists, a reset link will be sent"}), 200
 
 
 # ==================================================
@@ -266,7 +392,7 @@ def get_announcements():
                 "error": "Failed to retrieve announcements"
             }), 500
 
-        return jsonify(announcements), 200
+        return jsonify({"announcements": announcements}), 200
 
     except Exception:
         app.logger.exception("Failed to retrieve announcements")

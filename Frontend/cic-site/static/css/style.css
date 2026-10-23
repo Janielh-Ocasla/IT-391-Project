@@ -15,6 +15,10 @@ body {
 
 /* --- SCROLLING NAVBAR STYLE --- */
 .header {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 12px 24px;
     position: fixed;
     top: 0;
     left: 0;
@@ -26,28 +30,26 @@ body {
 }
 
 .logo-container {
-    position: absolute;
-    top: 10px;
-    left: 40px;
+    flex-shrink: 0;
 }
 
 .logo {
-    height: 100px;
+    height: 80px;
     width: auto;
     display: block;
 }
 
 .nav-links {
-    padding-top: 40px;
+    padding: 0;
     list-style: none;
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 20px;
+    gap: 16px;
 }
 
 .nav-links li {
-    margin-left: 20px;
+    margin-left: 0;
 }
 
 .header-box.current-page a {
@@ -55,7 +57,7 @@ body {
 }
 
 .header-box {
-    height: 80px;
+    padding: 12px 0;
     position: relative;
     z-index: 1;
 }
@@ -84,21 +86,20 @@ body {
     opacity: 0.7;
 }
 
-.divider {
-    font-size: 50px;
-    transform: translateY(-15px);
+.nav-links .divider {
+    font-size: 16px;
+    margin: 0;
 }
 
 .nav-links a {
     text-decoration: none; /* Removes underline */
-    font-size: 50px;
+    font-size: clamp(14px, 1.6vw, 24px);
     transition: color 0.3s;
 }
 #login-button {
-    position: absolute;
-    top: 50%;
-    right: 40px;
-    transform: translateY(-50%);
+    flex-shrink: 0;
+    margin-left: auto;
+    white-space: nowrap;
 
     padding: 10px 24px;
     background-color: var(--main-color);
@@ -112,6 +113,15 @@ body {
 
 #login-button:hover {
     background-color: #4969c2;
+}
+
+@media (max-width: 900px) {
+    .header { flex-wrap: wrap; gap: 8px 16px; padding: 8px 16px; }
+    .logo { height: 48px; }
+    .nav-links { order: 3; width: 100%; justify-content: flex-start; gap: 16px; }
+    .nav-links a { font-size: 16px; }
+    .header-box { padding: 4px 0; }
+    .nav-links .divider { display: none; }
 }
 
 /* Modified Overlay: Starts completely transparent and hidden */
