@@ -4,14 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home Page</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}">
 </head>
 <body>
 
     <nav class="header">
         <div class="logo-container">
             <a href="home.html">
-                <img src="images/Logo.png" alt="Community Innovation Center Logo" class="logo">
+                <img src="{{ url_for('static', filename='images/Logo.png') }}" alt="Community Innovation Center Logo" class="logo">
             </a>
         </div>
         <ul class="nav-links">
@@ -43,29 +44,18 @@
         <!--Login/Signup-->
         <button id="login-button">Login / Sign Up</button>
 
-        <div id="login-overlay" class="overlay">
-            <div class="login-box">
-                <button id="close-login" class="close-button">&times;</button>
-                <h2>Account Login</h2>
-                <form>
-                    <input type="text" placeholder="Username" required>
-                    <input type="password" placeholder="Password" required>
-                    <button type="submit" class="submit-btn">Sign In</button>
-                </form>
-            </div> 
-        </div>
-
     </nav>
 
     <main>
         <section id="wip">
             <!-- image: Hammer icon; flaticon.com -->
-            <img src="images/wip.png" alt="WIP Icon" class="hammer-wrench-icon">
+            <img src="{{ url_for('static', filename='images/wip.png') }}" alt="WIP Icon" class="hammer-wrench-icon">
             <h1>Sorry, this page is still being worked on</h1>
             <a href="home.html">Return Home</a>
         </section>
     </main>
 
-    <script src="js/script.js"></script>
+    <script src="{{ url_for('static', filename='js/api.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/site.js') }}" defer></script>
 </body>
 </html>

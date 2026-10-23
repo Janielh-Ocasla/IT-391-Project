@@ -106,28 +106,12 @@
   document.body.insertAdjacentHTML('beforeend', MODAL_HTML);
 
   const overlay  = document.getElementById('loginOverlay');
-  const openBtn  = document.getElementById('openLogin');
+  const openBtn  = document.getElementById('openLogin') || document.getElementById('login-button');
   const closeBtn = document.getElementById('closeLogin');
   let loggedIn = false;
 
   /* ---------- Helpers ---------- */
-  async function api(path, payload) {
-    const options = payload === undefined
-      ? { credentials: 'same-origin' }
-      : {
-          method: 'POST',
-          credentials: 'same-origin',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        };
-    try {
-      const res = await fetch(path, options);
-      const data = await res.json().catch(() => ({}));
-      return { status: res.status, ...data };
-    } catch (err) {
-      return { ok: false, error: 'Could not reach the server. Is it running?' };
-    }
-  }
+  const api = window.CICApi;
 
   function setMsg(id, text, type) {
     const el = document.getElementById(id);
@@ -171,7 +155,7 @@
   if (openBtn) {
     openBtn.addEventListener('click', async () => {
       if (loggedIn) {
-        await api('/api/logout', {});
+        await api.logout();
         loggedIn = false;
         updateHeaderButton();
         return;
@@ -210,7 +194,7 @@
 
     busy(form, true);
     setMsg('loginMsg', 'Logging in...');
-    const res = await api('/api/login', { email, password });
+    const res = await api.login({ email, password });
     busy(form, false);
 
     if (!res.ok) return setMsg('loginMsg', res.error || 'Login failed.', 'error');
@@ -245,7 +229,7 @@
 
     busy(form, true);
     setMsg('signupMsg', 'Creating your account...');
-    const res = await api('/api/signup', payload);
+    const res = await api.request('/api/register', { method: 'POST', body: payload });
     busy(form, false);
 
     if (!res.ok) return setMsg('signupMsg', res.error || 'Could not create account.', 'error');
@@ -264,8 +248,9 @@
     if (!emailOk(email)) return setMsg('forgotMsg', 'Please enter a valid email address.', 'error');
 
     busy(form, true);
-    await api('/api/reset-password', { email });
+    const res = await api.request('/api/reset-password', { method: 'POST', body: { email } });
     busy(form, false);
+    if (!res.ok) return setMsg('forgotMsg', res.error || 'Could not request a reset link.', 'error');
     setMsg('forgotMsg', 'If an account exists for that email, a reset link is on its way.', 'ok');
   });
 
@@ -275,9 +260,14 @@
       setMsg('loginMsg', btn.dataset.provider + " sign in isn't set up yet. Please use email.", 'error')));
 
   /* ---------- On page load: am I already logged in? ---------- */
+  window.addEventListener('cic:session-expired', () => {
+    loggedIn = false;
+    updateHeaderButton();
+  });
+
   (async () => {
-    const res = await api('/api/me');
-    if (res.logged_in) {
+    const res = await api.request('/api/me');
+    if (res.ok && res.logged_in) {
       loggedIn = true;
       updateHeaderButton();
     }
