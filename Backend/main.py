@@ -275,13 +275,36 @@ def register():
             "error": "Phone number must be a string"
         }), 400
 
-    return jsonify({
-        "error": (
-            "Registration temporarily unavailable "
-            "pending Auth/Profile setup"
-        )
-    }), 503
+    # return jsonify({
+    #     "error": (
+    #         "Registration temporarily unavailable "
+    #         "pending Auth/Profile setup"
+    #     )
+    # }), 503
+    if len(data["password"]) < 8:
+        return jsonify({
+            "error": "Password must be at least 8 characters"
+        }), 400
 
+    success = Account().create_account(
+        email=data["email"],
+        password=data["password"],
+        first_name=data["first_name"],
+        last_name=data["last_name"],
+        phone=data.get("phone", "")
+    )
+
+    if not success:
+        return jsonify({
+            "error": "Registration failed"
+        }), 500
+
+    return jsonify({
+        "message": (
+            "Registration request accepted. "
+            "Please check your email to confirm your account."
+        )
+    }), 201
 
 @app.route("/api/me", methods=["GET"])
 def current_user():
