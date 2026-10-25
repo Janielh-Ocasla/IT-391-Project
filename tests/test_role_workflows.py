@@ -68,54 +68,170 @@ class RoleWorkflowTests(unittest.TestCase):
         return self.call("POST", f"/api/assignments/{assignment_id}/verify", "admin",
                          json={"approved": approved})
 
-    def test_public_registration_is_blocked_for_both_roles(self):
-        """Registration status: both roles and both aliases return 503; no rows are created."""
-        before = deepcopy(self.db.tables)
-        for role in ("volunteer", "admin"):
-            for path in ("/api/register", "/api/signup"):
+    def test_public_registration_creates_profile_and_requires_email_confirmation(self):
+        """Both aliases create Auth/profile rows; confirmation enables login and identity lookup."""
+        self.db.email_autoconfirm = False
+        for index, path in enumerate(("/api/register", "/api/signup"), start=1):
+            with self.subTest(path=path):
+                email = f"new-{index}@cic-mock.example"
+                credentials = {"email": email, "password": "MockOnly!2026"}
                 response = self.call("POST", path, json={
-                    "email": f"new-{role}@cic-mock.example", "password": "MockOnly!2026",
-                    "first_name": "New", "last_name": role, "phone": "", "role": role,
+                    **credentials, "first_name": " New ", "last_name": " Volunteer ",
                 })
-                self.assertEqual(response.status_code, 503)
-        self.assertEqual(self.db.tables, before)
-        self.assertEqual(len(self.db.accounts), 3)
+                self.assertEqual(response.status_code, 201)
+                self.assertIn("check your email", response.json["message"])
+                self.assertNotIn("access_token", response.json)
+                auth_user = next(row for row in self.db.accounts.values() if row["email"] == email)
+                self.assertFalse(auth_user["confirmed"])
+                profile = self.db.row("profiles", auth_user["id"])
+                self.assertEqual((profile["email"], profile["first_name"], profile["last_name"],
+                                  profile["phone"], profile["role"]),
+                                 (email, "New", "Volunteer", "", "volunteer"))
+                self.assertEqual(len(self.db.accounts), 3 + index)
+                self.assertEqual(len(self.db.tables["profiles"]), 3 + index)
+                self.assertEqual(self.call("POST", "/api/login", json=credentials).status_code, 401)
 
-    def test_account_method_can_create_volunteer_when_profile_insert_succeeds(self):
-        """Module only: volunteer creation, profile normalization, and later API login work."""
-        created = account.Account().create_account(" NEW@CIC-MOCK.EXAMPLE ", "MockOnly!2026", " New ", " Volunteer ", " ")
+                # Simulate email confirmation locally; no confirmation email is sent.
+                auth_user["confirmed"] = True
+                login = self.call("POST", "/api/login", json=credentials)
+                self.assertEqual(login.status_code, 200)
+                self.assertEqual(login.json["role"], "volunteer")
+                identity = self.call("GET", "/api/me", headers={
+                    "Authorization": "Bearer " + login.json["access_token"],
+                })
+                self.assertEqual(identity.status_code, 200)
+                self.assertTrue(identity.json["logged_in"])
+                self.assertEqual((identity.json["user_id"], identity.json["role"]),
+                                 (auth_user["id"], "volunteer"))
+        self.observations.append("Both aliases created matching Auth/volunteer profile rows; login required simulated email confirmation.")
+
+    def test_account_method_sends_normalized_metadata_for_profile_trigger(self):
+        """Account sends normalized signup metadata; the trigger creates the profile."""
+        manager = account.Account()
+        with patch.object(manager.supabase.auth, "sign_up", wraps=manager.supabase.auth.sign_up) as sign_up, \
+             patch.object(manager.supabase, "table", wraps=manager.supabase.table) as table:
+            created = manager.create_account(" NEW@CIC-MOCK.EXAMPLE ", "MockOnly!2026", " New ", " Volunteer ", " 555-0100 ")
+            sign_up.assert_called_once_with({
+                "email": "new@cic-mock.example", "password": "MockOnly!2026",
+                "options": {"data": {"first_name": "New", "last_name": "Volunteer", "phone": "555-0100"}},
+            })
+            table.assert_not_called()
         self.assertTrue(created)
         profile = next(row for row in self.db.tables["profiles"] if row["email"] == "new@cic-mock.example")
-        self.assertEqual((profile["first_name"], profile["last_name"], profile["role"]), ("New", "Volunteer", "volunteer"))
+        self.assertEqual((profile["first_name"], profile["last_name"], profile["phone"], profile["role"]),
+                         ("New", "Volunteer", "555-0100", "volunteer"))
+        self.assertEqual(self.db.accounts[profile["id"]]["email"], profile["email"])
+        self.assertEqual(len(self.db.accounts), 4)
+        self.assertEqual(len(self.db.tables["profiles"]), 4)
         response = self.call("POST", "/api/login", json={"email": profile["email"], "password": "MockOnly!2026"})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json["role"], "volunteer")
-        self.observations.append("Account.create_account created an Auth record and a volunteer profile; public registration remains blocked.")
+        self.observations.append("Account passed normalized names/phone as Auth metadata without inserting a profile; the mock trigger created it.")
 
     def test_public_registration_cannot_create_admin(self):
-        """No Admin signup exists; Account.create_account always assigns volunteer."""
-        self.assertTrue(account.Account().create_account("new-admin@cic-mock.example", "MockOnly!2026", "New", "Admin", ""))
-        profile = next(row for row in self.db.tables["profiles"] if row["email"] == "new-admin@cic-mock.example")
-        self.assertEqual(profile["role"], "volunteer")
+        """Caller-supplied Admin roles on either alias create volunteers without Admin access."""
+        for index, path in enumerate(("/api/register", "/api/signup")):
+            with self.subTest(path=path):
+                credentials = {"email": f"new-admin-{index}@cic-mock.example", "password": "MockOnly!2026"}
+                response = self.call("POST", path, json={
+                    **credentials, "first_name": "New", "last_name": "Admin", "role": "admin",
+                })
+                self.assertEqual(response.status_code, 201)
+                profile = next(row for row in self.db.tables["profiles"] if row["email"] == credentials["email"])
+                self.assertEqual(profile["role"], "volunteer")
+                login = self.call("POST", "/api/login", json=credentials)
+                self.assertEqual(login.status_code, 200)
+                self.assertEqual(login.json["role"], "volunteer")
+                before = deepcopy(self.db.tables)
+                denied = self.call("POST", "/api/announcements", headers={
+                    "Authorization": "Bearer " + login.json["access_token"],
+                }, json={"title": "Not allowed", "content": "Not allowed"})
+                self.assertEqual(denied.status_code, 403)
+                self.assertEqual(self.db.tables, before)
         self.assertEqual(self.call("POST", "/api/admin/register", json={}).status_code, 404)
-        self.observations.append("Admin used by functional tests is a seeded account, not a successful public Admin registration.")
+        self.observations.append("Both aliases ignored caller-supplied Admin roles; newly registered volunteers were denied Admin actions.")
+
+    def test_auth_profile_trigger_ignores_role_in_user_metadata(self):
+        """Even direct mock Auth signup metadata cannot assign an Admin profile role."""
+        response = self.db.client().auth.sign_up({
+            "email": "metadata-admin@cic-mock.example", "password": "MockOnly!2026",
+            "options": {"data": {"first_name": "New", "last_name": "User", "role": "admin"}},
+        })
+        profile = self.db.row("profiles", response.user.id)
+        self.assertEqual(profile["role"], "volunteer")
+        self.assertEqual(profile["phone"], "")
 
     def test_duplicate_email_does_not_create_a_second_account(self):
         """Duplicate email registration through the account module is rejected."""
         alice = self.actors["alice"]
+        accounts_before, tables_before = deepcopy(self.db.accounts), deepcopy(self.db.tables)
         self.assertFalse(account.Account().create_account(alice["email"], alice["password"], "New", "Name", ""))
-        self.assertEqual(len(self.db.accounts), 3)
-        self.assertEqual(len(self.db.tables["profiles"]), 3)
-        self.observations.append("Duplicate Auth email rejected; Auth/profile counts unchanged.")
+        self.assertEqual(self.db.accounts, accounts_before)
+        self.assertEqual(self.db.tables, tables_before)
+        self.observations.append("Duplicate Auth email rejected; existing Auth/profile data unchanged.")
 
-    def test_profile_insert_failure_leaves_a_partial_auth_account(self):
-        """Registration risk: failed profile insert leaves an Auth account without a profile."""
+    def test_duplicate_email_through_both_aliases_preserves_existing_account(self):
+        """Case/whitespace variants of an existing email fail without changing its data."""
+        alice = self.actors["alice"]
+        accounts_before, tables_before = deepcopy(self.db.accounts), deepcopy(self.db.tables)
+        for path in ("/api/register", "/api/signup"):
+            with self.subTest(path=path):
+                response = self.call("POST", path, json={
+                    "email": " " + alice["email"].upper() + " ", "password": "Different!2026",
+                    "first_name": "Replacement", "last_name": "Name", "role": "admin",
+                })
+                self.assertEqual(response.status_code, 500)
+                self.assertEqual(response.json, {"ok": False, "error": "Registration failed"})
+                self.assertEqual(self.db.accounts, accounts_before)
+                self.assertEqual(self.db.tables, tables_before)
+        self.login("alice")
+
+    def test_profile_trigger_failure_rolls_back_auth_account(self):
+        """Failed profile creation rolls back signup; retry creates one Auth/profile pair."""
+        accounts_before, tables_before = deepcopy(self.db.accounts), deepcopy(self.db.tables)
+        manager = account.Account()
         self.db.fail_profile_insert = True
-        created = account.Account().create_account("partial@cic-mock.example", "MockOnly!2026", "Partial", "Account", "")
+        created = manager.create_account("partial@cic-mock.example", "MockOnly!2026", "Partial", "Account", "")
         self.assertFalse(created)
+        self.assertEqual(self.db.accounts, accounts_before)
+        self.assertEqual(self.db.tables, tables_before)
+        self.assertIsNone(manager.supabase.user_id)
+        self.db.fail_profile_insert = False
+        self.assertTrue(manager.create_account("partial@cic-mock.example", "MockOnly!2026", "Partial", "Account", ""))
         self.assertEqual(len(self.db.accounts), 4)
-        self.assertEqual(len(self.db.tables["profiles"]), 3)
-        self.observations.append("Simulated profile write failure: Auth record remains; no rollback is implemented. This does not prove actual RLS behavior.")
+        self.assertEqual(len(self.db.tables["profiles"]), 4)
+        self.observations.append("Mock profile trigger failure rolled back signup entirely; retry created exactly one Auth/profile pair.")
+
+    def test_public_registration_trigger_failure_is_atomic(self):
+        """Both aliases report trigger failures without leaving orphaned Auth/profile rows."""
+        self.db.fail_profile_insert = True
+        accounts_before, tables_before = deepcopy(self.db.accounts), deepcopy(self.db.tables)
+        for path in ("/api/register", "/api/signup"):
+            with self.subTest(path=path):
+                response = self.call("POST", path, json={
+                    "email": "rollback@cic-mock.example", "password": "MockOnly!2026",
+                    "first_name": "Rollback", "last_name": "User",
+                })
+                self.assertEqual(response.status_code, 500)
+                self.assertEqual(response.json, {"ok": False, "error": "Registration failed"})
+                self.assertEqual(self.db.accounts, accounts_before)
+                self.assertEqual(self.db.tables, tables_before)
+
+    def test_late_profile_trigger_failure_rolls_back_both_rows(self):
+        """A trigger error after the profile write also restores the complete transaction."""
+        accounts_before, tables_before = deepcopy(self.db.accounts), deepcopy(self.db.tables)
+        create_profile = self.db.create_profile_for_auth_user
+
+        def create_then_fail(auth_user):
+            create_profile(auth_user)
+            raise RuntimeError("Simulated failure after profile creation")
+
+        with patch.object(self.db, "create_profile_for_auth_user", side_effect=create_then_fail):
+            self.assertFalse(account.Account().create_account(
+                "late-failure@cic-mock.example", "MockOnly!2026", "Late", "Failure", "",
+            ))
+        self.assertEqual(self.db.accounts, accounts_before)
+        self.assertEqual(self.db.tables, tables_before)
 
     def test_unconfirmed_email_and_bad_password_cannot_login(self):
         """Unconfirmed email, unknown email, and bad password cannot log in."""

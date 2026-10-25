@@ -119,14 +119,50 @@ class ApiTests(unittest.TestCase):
             self.check_json(self.client.get("/api/me", headers=self.headers), 401)
             self.check_json(self.client.get("/api/me", headers={"Authorization": "Basic abc"}), 401)
 
-    def test_registration_alias_stays_paused(self):
+    def test_registration_aliases_accept_valid_signup(self):
         body = dict(email="v@example.com", password="password", first_name="Test", last_name="Volunteer")
+        self.manager.create_account.return_value = True
+        responses = []
+        with patch.object(main, "Account", return_value=self.manager) as account:
+            for path in ("/api/register", "/api/signup"):
+                for phone in ({}, {"phone": "555-0100"}):
+                    with self.subTest(path=path, phone=phone):
+                        account.reset_mock()
+                        self.manager.create_account.reset_mock()
+                        # Caller-supplied roles must not be forwarded to Account.
+                        response = self.client.post(path, json={**body, **phone, "role": "admin"})
+                        data = self.check_json(response, 201)
+                        self.assertEqual(data, {
+                            "ok": True,
+                            "message": "Registration request accepted. Please check your email to confirm your account.",
+                        })
+                        account.assert_called_once_with()
+                        self.manager.create_account.assert_called_once_with(**body, phone=phone.get("phone", ""))
+                        responses.append(data)
+        self.assertTrue(all(data == responses[0] for data in responses))
+
+    def test_registration_validation_rejects_bad_input_before_client_creation(self):
+        body = dict(email="v@example.com", password="password", first_name="Test", last_name="Volunteer")
+        invalid_bodies = [None, [], {}, "invalid", {**body, "password": "short12"}]
+        for field in body:
+            invalid_bodies.append({key: value for key, value in body.items() if key != field})
+            invalid_bodies.extend({**body, field: value} for value in (None, 1, False, [], {}, "", "   "))
+        invalid_bodies.extend({**body, "phone": value} for value in (None, 1, False, [], {}))
         with patch.object(main, "Account") as account:
-            first = self.client.post("/api/register", json=body)
-            second = self.client.post("/api/signup", json=body)
-            self.check_json(first, 503)
-            self.assertEqual(first.json, second.json)
+            for path in ("/api/register", "/api/signup"):
+                for invalid in invalid_bodies:
+                    with self.subTest(path=path, body=invalid):
+                        self.check_json(self.client.post(path, json=invalid), 400)
             account.assert_not_called()
+
+    def test_registration_aliases_return_generic_failure(self):
+        body = dict(email="v@example.com", password="password", first_name="Test", last_name="Volunteer")
+        self.manager.create_account.return_value = False
+        with patch.object(main, "Account", return_value=self.manager):
+            for path in ("/api/register", "/api/signup"):
+                with self.subTest(path=path):
+                    data = self.check_json(self.client.post(path, json=body), 500)
+                    self.assertEqual(data, {"ok": False, "error": "Registration failed"})
 
     def test_reset_password_validates_body_and_hides_account_existence(self):
         with patch.object(main, "Account", return_value=self.manager):

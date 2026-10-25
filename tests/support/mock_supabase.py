@@ -1,7 +1,8 @@
 """Stateful Supabase substitute used only by offline tests.
 
 Runs the real CIC managers against shared in-memory rows. This models the
-operations used by this repository, not the project's actual RLS policies.
+operations used by this repository, including the signup profile trigger and
+its transaction rollback, not the project's actual RLS policies.
 """
 from copy import deepcopy
 from datetime import datetime, timezone
@@ -64,6 +65,18 @@ class MockDatabase:
         key = "announcement_id" if table == "announcements" else "id"
         return next(row for row in self.tables[table] if row[key] == row_id)
 
+    def create_profile_for_auth_user(self, account):
+        """Model the database trigger; public signup always creates a volunteer."""
+        metadata = account.get("options", {}).get("data", {})
+        MockQuery(self, "profiles").insert({
+            "id": account["id"],
+            "email": account["email"],
+            "first_name": metadata.get("first_name", ""),
+            "last_name": metadata.get("last_name", ""),
+            "phone": metadata.get("phone", ""),
+            "role": "volunteer",
+        }).execute()
+
 
 class MockClient:
     def __init__(self, database):
@@ -106,7 +119,16 @@ class MockAuth:
         if any(account["email"] == data["email"] for account in self.database.accounts.values()):
             raise ValueError("Mock email already registered")
         user_id = str(uuid4())
-        self.database.accounts[user_id] = dict(data, id=user_id, confirmed=self.database.email_autoconfirm)
+        profiles_before = deepcopy(self.database.tables["profiles"])
+        account = dict(deepcopy(data), id=user_id, confirmed=self.database.email_autoconfirm)
+        self.database.accounts[user_id] = account
+        try:
+            self.database.create_profile_for_auth_user(account)
+        except Exception:
+            # Auth and its profile trigger run in the same database transaction.
+            del self.database.accounts[user_id]
+            self.database.tables["profiles"][:] = profiles_before
+            raise
         user = SimpleNamespace(id=user_id)
         session = None
         if self.database.email_autoconfirm:
