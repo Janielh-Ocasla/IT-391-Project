@@ -14,6 +14,10 @@ body {
 
 /*-----Header-----*/
 .header {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 12px 24px;
     position: fixed;
     top: 0;
     left: 0;
@@ -29,28 +33,26 @@ body {
 }
 
 .logo-container {
-    position: absolute;
-    top: 10px;
-    left: 40px;
+    flex-shrink: 0;
 }
 
 .logo {
-    height: 100px;
+    height: 80px;
     width: auto;
     display: block;
 }
 
 .nav-links {
-    padding-top: 40px;
+    padding: 0;
     list-style: none;
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 20px;
+    gap: 16px;
 }
 
 .nav-links li {
-    margin-left: 20px;
+    margin-left: 0;
 }
 
 .header-box.current-page a {
@@ -58,7 +60,7 @@ body {
 }
 
 .header-box {
-    height: 80px;
+    padding: 12px 0;
     position: relative;
     z-index: 1;
 }
@@ -95,7 +97,7 @@ body {
 
 .nav-links a {
     text-decoration: none; /* Removes underline */
-    font-size: 50px;
+    font-size: clamp(14px, 1.6vw, 24px);
     transition: color 0.3s;
 }
 

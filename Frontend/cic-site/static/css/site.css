@@ -90,7 +90,9 @@ img { max-width: 100%; }
   backdrop-filter: blur(3px);
   z-index: 1000;
 }
-.overlay.open { display: flex; }
+.overlay.open { display: flex; opacity: 1; visibility: visible; }
+
+.modal .view { padding-top: 0; }
 
 .modal {
   position: relative;

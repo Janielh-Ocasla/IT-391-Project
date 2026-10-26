@@ -15,55 +15,86 @@ class Account:
             os.environ.get("SUPABASE_PUBLISHABLE_KEY")
         )
 
-    def create_account(self, email, password, first_name, last_name, phone):
-        """
-        Creates a new account
+    # def create_account(self, email, password, first_name, last_name, phone):
+    #     """
+    #     Creates a new account
 
-        :param email: user's email address
-        :param password: user's password
-        :param first_name: user's first name
-        :param last_name: user's last name
-        :param phone: user's phone number
-        :return: True if account created, False otherwise
-        """
+    #     :param email: user's email address
+    #     :param password: user's password
+    #     :param first_name: user's first name
+    #     :param last_name: user's last name
+    #     :param phone: user's phone number
+    #     :return: True if account created, False otherwise
+    #     """
+    #     try:
+    #         # clean and normalize user inputs
+    #         email = email.strip().lower()
+    #         first_name = first_name.strip()
+    #         last_name = last_name.strip()
+    #         phone = phone.strip()
+
+    #         # check required information
+    #         if not email or not password or not first_name or not last_name:
+    #             print("Account creation failed: Required information is missing")
+    #             return False
+
+    #         # create the account in Supabase
+    #         response = self.supabase.auth.sign_up({
+    #             "email": email,
+    #             "password": password
+    #         })
+    #         if response.user is None:
+    #             print("Account creation failed.")
+    #             return False
+
+    #         # store user information in the profiles
+    #         profile_data = {
+    #             "id": response.user.id,
+    #             "email": email,
+    #             "first_name": first_name,
+    #             "last_name": last_name,
+    #             "phone": phone,
+    #             "role": "volunteer"
+    #         }
+    #         self.supabase.table("profiles").insert(profile_data).execute()
+    #         print("Account created successfully.")
+    #         return True
+
+    #     except Exception as e:
+    #         print(f"An error occurred during account creation: {e}")
+    #         return False
+    def create_account(self, email, password, first_name, last_name, phone):
         try:
-            # clean and normalize user inputs
             email = email.strip().lower()
             first_name = first_name.strip()
             last_name = last_name.strip()
-            phone = phone.strip()
+            phone = (phone or "").strip()
 
-            # check required information
             if not email or not password or not first_name or not last_name:
-                print("Account creation failed: Required information is missing")
                 return False
-            
-            # create the account in Supabase
+
             response = self.supabase.auth.sign_up({
                 "email": email,
-                "password": password
+                "password": password,
+                "options": {
+                    "data": {
+                        "first_name": first_name,
+                        "last_name": last_name,
+                        "phone": phone
+                    }
+                }
             })
+
             if response.user is None:
-                print("Account creation failed.")
+                print("Account registration was not accepted.")
                 return False
 
-            # store user information in the profiles
-            profile_data = {
-                "id": response.user.id,
-                "email": email,
-                "first_name": first_name,
-                "last_name": last_name,
-                "phone": phone,
-                "role": "volunteer"
-            }
-            self.supabase.table("profiles").insert(profile_data).execute()
-            print("Account created successfully.")
+            print("Registration request accepted.")
             return True
-        
+
         except Exception as e:
-            print(f"An error occurred during account creation: {e}")
+            print(f"Account creation failed: {e}")
             return False
-        
     def login(self, email, password):
         """
         Logs a user in and returns their role so the application knows which dashboard to show
@@ -141,17 +172,27 @@ class Account:
         :return: updated profile information if successful, None otherwise
         """
         try:
+            updates = {
+                field: value
+                for field, value in {
+                    "email": email,
+                    "first_name": first_name,
+                    "last_name": last_name,
+                    "phone": phone,
+                }.items()
+                if value is not None
+            }
+            if not updates:
+                return None
+
             # Update email in Supabase Auth if provided
             if email:
                 self.supabase.auth.update_user({"email": email})
 
             # Update profile fields in your database
-            response = self.supabase.table("profiles").update({
-                "email": email,
-                "first_name": first_name,
-                "last_name": last_name,
-                "phone": phone
-            }).eq("id", user_id).execute()
+            response = self.supabase.table("profiles").update(
+                updates
+            ).eq("id", user_id).execute()
             return response.data
 
         except Exception as e:

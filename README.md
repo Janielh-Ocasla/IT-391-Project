@@ -17,45 +17,69 @@ NEVER commit .env as it holds your keys!
 - python-dotenv 
 
 # How to Set Up
-Install VS Code: https://code.visualstudio.com/
 
-Step 1: Create a virtual environment (recommended)
-``` 
-python -m venv venv
-```
-On macOS, use python3 if python is not working.
+Use Python 3.12 or newer. From the repository root:
 
-Step 2: Activate the virtual environment
-```
-On macOS/Linux: source venv/bin/activate
-```
-```
-On Windows (PowerShell): venv\Scripts\Activate.ps1
-```
-```
-On Windows (Command Prompt): venv\Scripts\activate.bat
+```sh
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env
 ```
 
-If VS Code asks to use the virtual environment, choose "Yes". Install everything and run the code from inside it.
+On Windows, activate the environment with `.venv\Scripts\Activate.ps1`
+(PowerShell) or `.venv\Scripts\activate.bat` (Command Prompt).
 
-Step 3: Install python-dotenv
-```
-pip install python-dotenv
-```
-
-Step 4: Install Flask 
-```
-pip install flask
-```
-
-Step 5: Install Supabase
-```
-pip install supabase
-```
-
-Done! 
+Fill in `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` in `.env`.
+Keep `.env` private; it is ignored by Git.
 
 # How to Run
-Run this in your terminal: python backend/main.py
 
-Then open your browser and navigate to http://127.0.0.1:5050
+```sh
+python -m Backend.main
+```
+
+Open http://127.0.0.1:5050. This single Flask application serves the frontend,
+static assets, and all `/api/*` endpoints. `python Backend/main.py` also works.
+The old `Frontend/cic-site/app.py` entry point delegates to the same application
+and uses port 5050.
+
+Do not start both entry points at once. No second frontend server or CORS
+configuration is needed. The homepage is `home.html`; `/`, `/index.html`, and
+`/home.html` all render it. About, Donate, and Volunteer pages are also available.
+
+# API Contract
+
+See [docs/API.md](docs/API.md) for endpoints, authentication, request examples,
+and response shapes. The shared browser client is
+`Frontend/cic-site/static/js/api.js` (`window.CICApi`).
+
+- Every API JSON response has `ok: true` or `ok: false`.
+- Errors include `error` and use an appropriate HTTP error status.
+- Protected endpoints require `Authorization: Bearer <access_token>`.
+- Login stores the access token in the browser tab's `sessionStorage`; requests
+  attach it automatically. Flask session cookies are not used for authentication.
+- Registration remains paused pending the existing Auth/Profile setup decision.
+
+# Tests
+
+The tests mock Supabase; they do not modify live data or send reset emails.
+
+```sh
+python -m unittest discover -s tests -v
+node --test tests/api-client.test.cjs
+```
+
+Node.js is only needed for the browser-client tests, not to run the application.
+
+To run the stateful Volunteer/Admin mock workflows and regenerate a readable
+report with per-scenario evidence:
+
+```sh
+python -m scripts.verify_mock_roles
+```
+
+See [docs/MOCK_VERIFICATION.md](docs/MOCK_VERIFICATION.md) for results, including
+blocked registration and business methods that do not yet have API routes.
+The mock uses fictional data from `tests/fixtures/role_scenarios.json`, runs the
+real business classes, and blocks all network connections during each scenario.

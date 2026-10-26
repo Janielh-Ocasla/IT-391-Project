@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>About | Community Innovation Center</title>
   <meta name="description" content="Learn about the Community Innovation Center, a Chicago southwest side nonprofit empowering individuals and communities." />
-  <link rel="stylesheet" href="../static/css/site.css" />
-  <link rel="stylesheet" href="../static/css/about.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/about.css') }}" />
 </head>
 <body>
 
@@ -207,7 +207,8 @@
     </div>
   </footer>
 
-  <script src="../static/js/site.js" defer></script>
+  <script src="{{ url_for('static', filename='js/api.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/site.js') }}" defer></script>
   <script>
     // Count the statistics up when they scroll into view
     (function () {
