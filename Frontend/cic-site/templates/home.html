@@ -21,19 +21,19 @@
                     <a>Home</a>
                 </div>
             </li>
-            <li class="divider">|</li>
+            <li class="nav-divider">|</li>
             <li>
                 <div class="header-box">
                     <a href="about.html">About</a>
                 </div>
             </li>
-            <li class="divider">|</li>
+            <li class="nav-divider">|</li>
             <li>
                 <div class="header-box">
                     <a href="donate.html">Donate</a>
                 </div>
             </li>
-            <li class="divider">|</li>
+            <li class="nav-divider">|</li>
             <li>
                 <div class="header-box">
                     <a href="volunteer.html">Volunteer</a>
@@ -42,7 +42,7 @@
         </ul>
 
         <!--Login/Signup-->
-        <button id="login-button">Login / Sign Up</button>
+        <button class="btn btn-primary" id="openLogin">Login / Signup</button>
 
     </nav>
 
@@ -63,7 +63,23 @@
                         our initiatives are rooted in a commitment to building stronger, healthier, and more vibrant communities.
                     </p>
                 </div>
-                <img src="{{ url_for('static', filename='images/Overview.jpg') }}" alt="Overview Image">
+                <img src="../static/images/Overview.jpg" alt="Overview Image">
+            </div>
+        </section>
+
+        <!--Call to Action-->
+        <section id="call-to-action">
+            <h1>Want to support our community or receive volunteer help?</h1>
+            <h3>Visit our Donate and Volunteer pages!</h3>
+            <div class="cards">
+                <div>
+                    <img src="../static/images/Volunteer.jpg" alt="Volunteer Image">
+                    <a href="volunteer.html">Volunteer</a>
+                </div>
+                <div>
+                    <img src="https://www.thedailymeal.com/img/gallery/these-14-grocery-stores-actually-donate-unsold-food/intro-1777386643.jpg" alt="Donate Image">
+                    <a href="donate.html">Donate</a>
+                </div>
             </div>
         </section>
 
@@ -72,24 +88,79 @@
             <h1>Recent Events</h1>
             <div class="scroll-box">
                 <article>
-                    <h3>Article Title 1</h3>
-                    <p>Summary or text of the first article goes here.</p>
+                    <a href="https://www.youtube.com/watch?v=xJyAzmBLYHw">
+                        <img src="https://static.wixstatic.com/media/b63054_1081f161755c46c19016394b12888259~mv2.png/v1/fill/w_536,h_301,fp_0.50_0.50,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/Screenshot%202025-12-01%20002136.png">
+                    </a>
+                    <div class="article-info">
+                        <a class="article-title" target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/watch?v=xJyAzmBLYHw"><h1>Chicago group helps shovel snow, deliver food for seniors</h1></a>
+                        <h3><time datetime="2025-11-30">11/30/25</time></h3>
+                        <h3>ABC 7 Chicago</h3>
+                    </div>
                 </article>
   
                 <article>
-                    <h3>Article Title 2</h3>
-                    <p>Summary or text of the second article goes here.</p>
+                    <a href="https://blockclubchicago.org/2025/11/28/immigrant-families-face-deepening-hunger-crisis-as-snap-cuts-meet-deportation-fears/">
+                        <img src="https://static.wixstatic.com/media/b63054_eb16a6066b51420381814659445c3a67~mv2.png/v1/fill/w_536,h_301,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/Block%20Club.png">
+                    </a>
+                    <div class="article-info">
+                        <a class="article-title" target="_blank" rel="noopener noreferrer" href="https://blockclubchicago.org/2025/11/28/immigrant-families-face-deepening-hunger-crisis-as-snap-cuts-meet-deportation-fears/"><h1>Immigrant Families Face Deepening Hunger Crisis As SNAP Cuts Meet Deportation Fears</h1></a>
+                        <h3><time datetime="2025-11-28">11/28/25</time></h3>
+                        <h3>Block Club Chicago</h3>
+                    </div>
                 </article>
 
                 <article>
-                    <h3>Article Title 3</h3>
-                    <p>Summary or text of the third article goes here.</p>
+                    <img src="https://static.wixstatic.com/media/b63054_b3036609bc454880abfc3a4dd79053df~mv2.png/v1/crop/x_0,y_0,w_1917,h_1078/fill/w_536,h_301,fp_0.50_0.50,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/ABC7.png">
+                    <div class="article-info">
+                        <a class="article-title"><h1>Volunteers collecting food on SW Side for those in need amid high prices, looming SNAP benefits halt</h1></a>
+                        <h3><time datetime="2025-10-25">10/25/2025</time></h3>
+                        <h3>ABC 7 Chicago</h3>
+                    </div>
+                </article>
+
+                <article>
+                    <a href="https://www.cbsnews.com/chicago/news/midway-delivery-program-groceries-chicago-immigration-crackdown-government-shutdown/">
+                        <img src="https://static.wixstatic.com/media/b63054_92bd5bbda61a4d1eb9d65cc1f26aed9e~mv2.png/v1/crop/x_54,y_0,w_1791,h_1007/fill/w_536,h_301,fp_0.50_0.50,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/CBS.png">
+                    </a>
+                    <div class="article-info">
+                        <a class="article-title" target="_blank" rel="noopener noreferrer" href="https://www.cbsnews.com/chicago/news/midway-delivery-program-groceries-chicago-immigration-crackdown-government-shutdown/"><h1>Midway Delivery Program rallies community to feed families in need amid immigration crackdown, government shutdown</h1></a>
+                        <h3><time datetime="2025-10-24">10/24/2025</time></h3>
+                        <h3>CBS News Chicago</h3>
+                    </div>
+                </article>
+
+                <article>
+                    <a href="https://borderlessmag.org/2025/11/24/illinois-immigration-trump-administration-snap-cuts-deportation-fears/">
+                        <img src="https://static.wixstatic.com/media/b63054_e7b9331b7b72456a8e28f06ae28de599~mv2.jpg/v1/fill/w_536,h_301,fp_0.49_0.43,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Borderless.jpg">
+                    </a>
+                    <div class="article-info">
+                        <a class="article-title" target="_blank" rel="noopener noreferrer" href="https://borderlessmag.org/2025/11/24/illinois-immigration-trump-administration-snap-cuts-deportation-fears/"><h1>Immigrant Families Face Deepening Hunger Crisis as SNAP Cuts Meet Deportation Fears</h1></a>
+                        <h3><time datetime="2025-10-24">10/24/2025</time></h3>
+                        <h3>Borderless</h3>
+                    </div>
                 </article>
             </div>
         </section>
     </main>
 
-    <script src="{{ url_for('static', filename='js/api.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='js/site.js') }}" defer></script>
+    <!-- ===== Footer ===== -->
+    <footer class="site-footer">
+        <div class="container">
+        <div class="footer-grid">
+            <img alt="Community Innovation Center"
+                src="https://static.wixstatic.com/media/c5f985_712eb51acfae41ef9dacca664413c454~mv2.png/v1/fill/w_980,h_509,al_c,q_90/transparent%20logo_edited.png" />
+            <ul class="footer-links">
+            <li><a href="mailto:innovationcenter1050@gmail.com">innovationcenter1050@gmail.com</a></li>
+            <li><a href="https://www.facebook.com/profile.php?id=61564768987902" rel="noopener">Facebook</a></li>
+            <li><a href="https://www.instagram.com/communityinnovationcenter/" rel="noopener">Instagram</a></li>
+            <li><a href="#">Terms &amp; Conditions</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            </ul>
+        </div>
+        <p class="footer-copy">Chicago, Illinois</p>
+        </div>
+    </footer>
+
+    <script src="../static/js/site.js" defer></script>
 </body>
 </html>

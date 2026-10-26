@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}">
 </head>
 <body>
-
+    <!--Header-->
     <nav class="header">
         <div class="logo-container">
             <a href="home.html">
@@ -21,19 +21,19 @@
                     <a href="home.html">Home</a>
                 </div>
             </li>
-            <li class="divider">|</li>
+            <li class="nav-divider">|</li>
             <li>
                 <div class="header-box">
                     <a href="about.html">About</a>
                 </div>
             </li>
-            <li class="divider">|</li>
+            <li class="nav-divider">|</li>
             <li>
                 <div class="header-box">
                     <a href="donate.html">Donate</a>
                 </div>
             </li>
-            <li class="divider">|</li>
+            <li class="nav-divider">|</li>
             <li>
                 <div class="header-box current-page">
                     <a>Volunteer</a>
@@ -42,7 +42,7 @@
         </ul>
 
         <!--Login/Signup-->
-        <button id="login-button">Login / Sign Up</button>
+        <button class="btn btn-primary" id="openLogin">Login / Signup</button>
 
     </nav>
 
@@ -55,6 +55,25 @@
         </section>
     </main>
 
+    <!-- ===== Footer ===== -->
+    <footer class="site-footer">
+        <div class="container">
+        <div class="footer-grid">
+            <img alt="Community Innovation Center"
+                src="https://static.wixstatic.com/media/c5f985_712eb51acfae41ef9dacca664413c454~mv2.png/v1/fill/w_980,h_509,al_c,q_90/transparent%20logo_edited.png" />
+            <ul class="footer-links">
+            <li><a href="mailto:innovationcenter1050@gmail.com">innovationcenter1050@gmail.com</a></li>
+            <li><a href="https://www.facebook.com/profile.php?id=61564768987902" rel="noopener">Facebook</a></li>
+            <li><a href="https://www.instagram.com/communityinnovationcenter/" rel="noopener">Instagram</a></li>
+            <li><a href="#">Terms &amp; Conditions</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            </ul>
+        </div>
+        <p class="footer-copy">Chicago, Illinois</p>
+        </div>
+    </footer>
+
+    <script src="../static/js/site.js"></script>
     <script src="{{ url_for('static', filename='js/api.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/site.js') }}" defer></script>
 </body>

@@ -6,14 +6,13 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    color: var(--main-color);
 }
 
 body {
     font-family: Arial, sans-serif;
 }
 
-/* --- SCROLLING NAVBAR STYLE --- */
+/*-----Header-----*/
 .header {
     display: flex;
     align-items: center;
@@ -27,6 +26,10 @@ body {
     background-color: #ffffff;
     z-index: 1000;
     border-bottom: 2px solid var(--main-color);
+}
+
+.header-box a {
+    color: var(--main-color);
 }
 
 .logo-container {
@@ -86,9 +89,10 @@ body {
     opacity: 0.7;
 }
 
-.nav-links .divider {
-    font-size: 16px;
-    margin: 0;
+.nav-divider {
+    font-size: 50px;
+    transform: translateY(-15px);
+    color: var(--main-color);
 }
 
 .nav-links a {
@@ -96,84 +100,16 @@ body {
     font-size: clamp(14px, 1.6vw, 24px);
     transition: color 0.3s;
 }
-#login-button {
-    flex-shrink: 0;
-    margin-left: auto;
-    white-space: nowrap;
 
-    padding: 10px 24px;
-    background-color: var(--main-color);
-    color: #ffffff;
-    border: none;
-    border-radius: 6px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+#openLogin {
+    position: absolute;
+    top: 50%;
+    right: 40px;
+    transform: translateY(-50%);
 }
 
-#login-button:hover {
-    background-color: #4969c2;
-}
-
-@media (max-width: 900px) {
-    .header { flex-wrap: wrap; gap: 8px 16px; padding: 8px 16px; }
-    .logo { height: 48px; }
-    .nav-links { order: 3; width: 100%; justify-content: flex-start; gap: 16px; }
-    .nav-links a { font-size: 16px; }
-    .header-box { padding: 4px 0; }
-    .nav-links .divider { display: none; }
-}
-
-/* Modified Overlay: Starts completely transparent and hidden */
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(5px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  
-  /* Smooth transition rules */
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.4s ease, visibility 0.4s ease;
-}
-
-/* Modified Login Box: Starts slightly smaller for a pop effect */
-.login-box {
-  background-color: rgba(255, 255, 255, 1);
-  border-radius: 12px;
-  padding: 40px;
-  width: 320px;
-  text-align: center;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-  color: #fff;
-  position: relative;
-
-  /* Scale transition */
-  transform: scale(0.8);
-  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Slight bounce */
-}
-
-/* Active Class: Triggered by JavaScript to fade everything in */
-.overlay.active {
-  opacity: 1;
-  visibility: visible;
-}
-
-/* Scales the form to normal size when active */
-.overlay.active .login-box {
-  transform: scale(1);
-}
-
-.overlay form {
-    display: flex;
-    flex-direction: column;
+#openLogin:hover {
+    background-color: #1877f2;
 }
 
 main {
@@ -182,14 +118,17 @@ main {
 
 section {
     padding-top: 60px;
+    padding-bottom: 60px;
 }
 
+/*-----Overview Section-----*/
 #cic-overview {
     background-color: rgb(174, 216, 255);
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    color: var(--main-color);
 }
 
 .overview {
@@ -222,6 +161,7 @@ section:not(#wip) div.overview-paragraph {
     border-radius: 10px;
 }
 
+/*-----Styles for Work In Progress pages*/
 section#wip{
     height: 80vh;
     display: flex;
@@ -238,6 +178,79 @@ section#wip img{
     height: auto;
 }
 
+/*-----Call to Action Section-----*/
+#call-to-action {
+    color: var(--main-color);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-wrap: wrap;
+    background-color: rgb(174, 216, 255);
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+    padding: 50px;
+    gap: 20px;
+}
+
+.cards {
+    display: flex;
+    flex-direction: row;
+    gap: 30px;
+    align-items: center;
+    justify-content: center;
+}
+
+.cards div {
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5), 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+#call-to-action .cards > div {
+    background-color: white;
+    border-color: black;
+    width: 40vw;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    padding: 20px;
+}
+
+#call-to-action .cards > div img {
+    border-radius: 10px;
+    width: 100%;
+    height: 40vh;
+    object-fit: cover;
+}
+
+#call-to-action a {
+    text-transform: uppercase;
+    font-size: 50px;
+    color: var(--main-color);
+    text-decoration: none;
+    position: relative;
+}
+
+#call-to-action a::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: var(--main-color);
+
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 0.3s ease-in-out;
+}
+
+#call-to-action a:hover::after {
+    transform: scaleX(1);
+}
+
+/*-----Recent Events section-----*/
 #recent-events {
     display: flex;
     flex-direction: column;
@@ -256,7 +269,6 @@ section#wip img{
     overflow-x: hidden;
     border: 1px solid #ccc;
     padding: 20px;
-    text-align: center;
     background-color: #e4e7eb;
     box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5), 0 1px 0 rgba(255, 255, 255, 0.8);
 }
@@ -287,4 +299,99 @@ section#wip img{
     border-radius: 10px;
     border: 1px solid rgb(138, 138, 138);
     gap: 10px;
+    display: flex;
+    flex-direction: row;
+}
+
+.scroll-box img {
+    width: 400px;
+    height: 225px;
+    flex-shrink: 0;
+    object-fit: cover;
+    display: block;
+    border-radius: 12px;
+}
+
+.scroll-box article > a,
+.scroll-box article > img {
+    flex: 0 0 400px;
+}
+
+.scroll-box .article-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+    gap: 10px;
+}
+
+.article-title {
+    color: var(--main-color);
+}
+
+/* ---------- Footer ---------- */
+.site-footer { background: #14233a; color: #cfd8e6; padding: 40px 0;}
+.footer-grid { display: flex; flex-wrap: wrap; gap: 24px 48px; justify-content: space-between; align-items: center; margin-left: 50px; margin-right: 50px;}
+.site-footer a { color: #fff; }
+.site-footer img { height: 44px; width: auto; background: #fff; border-radius: 10px; padding: 4px 8px; }
+.footer-links { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 0; padding: 0; list-style: none; }
+.footer-copy { margin: 24px 0 0; font-size: 0.85rem; color: #9fb0c8; margin-left: 45px;}
+
+/*------Donate Page-----*/
+#donate {
+    height: 135vh;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+    gap: 30px;
+    color: var(--main-color);
+}
+
+#donate h1 {
+    font-size: 80px;
+}
+
+#donate img{
+    border-radius: 10px;
+}
+
+#grocery-donation {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: left;
+    width: 300px;
+    gap: 15px;
+}
+
+#grocery-donate-button {
+    padding: 10px;
+    border-radius: 20px;
+    background-color: rgb(20, 102, 255);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5), 0 1px 0 rgba(255, 255, 255, 0.8);
+    color: white;
+    text-decoration: none;
+}
+
+#donation-location {
+    font-size: 30px;
+    padding-top: 40px;
+}
+
+#monetary-donations {
+    margin: 30px;
+    font-size: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 2px 25px rgba(0, 0, 0, 0.5), 0 1px 0 rgba(255, 255, 255, 0.8);
+    border-radius: 15px;
+    padding: 30px;
+}
+
+#monetary-donations img {
+    width: 50px;
+    height: auto;
 }
