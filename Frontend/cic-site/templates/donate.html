@@ -4,14 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home Page</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="../static/css/site.css">
+    <link rel="stylesheet" href="../static/css/style.css">
 </head>
 <body>
 
+    <!--Header-->
     <nav class="header">
         <div class="logo-container">
             <a href="home.html">
-                <img src="images/Logo.png" alt="Community Innovation Center Logo" class="logo">
+                <img src="../static/images/Logo.png" alt="Community Innovation Center Logo" class="logo">
             </a>
         </div>
         <ul class="nav-links">
@@ -20,19 +22,19 @@
                     <a href="home.html">Home</a>
                 </div>
             </li>
-            <li class="divider">|</li>
+            <li class="nav-divider">|</li>
             <li>
                 <div class="header-box">
                     <a href="about.html">About</a>
                 </div>
             </li>
-            <li class="divider">|</li>
+            <li class="nav-divider">|</li>
             <li>
                 <div class="header-box current-page">
                     <a>Donate</a>
                 </div>
             </li>
-            <li class="divider">|</li>
+            <li class="nav-divider">|</li>
             <li>
                 <div class="header-box">
                     <a href="volunteer.html">Volunteer</a>
@@ -41,31 +43,55 @@
         </ul>
 
         <!--Login/Signup-->
-        <button id="login-button">Login / Sign Up</button>
-
-        <div id="login-overlay" class="overlay">
-            <div class="login-box">
-                <button id="close-login" class="close-button">&times;</button>
-                <h2>Account Login</h2>
-                <form>
-                    <input type="text" placeholder="Username" required>
-                    <input type="password" placeholder="Password" required>
-                    <button type="submit" class="submit-btn">Sign In</button>
-                </form>
-            </div> 
-        </div>
+        <button class="btn btn-primary" id="openLogin">Login / Signup</button>
 
     </nav>
 
     <main>
-        <section id="wip">
-            <!-- image: Hammer icon; flaticon.com -->
-            <img src="images/wip.png" alt="WIP Icon" class="hammer-wrench-icon">
-            <h1>Sorry, this page is still being worked on</h1>
-            <a href="home.html">Return Home</a>
+        <section id="donate">
+            <h1>Ways to Donate</h1>
+            <h3>We welcome any contributions for our current initiatives! Every little bit helps.</h3>
+            <div id="grocery-donation">
+                <img src="https://static.wixstatic.com/media/11062b_f890e9a3b41a43f7b3e3b5098f846894~mv2.jpg/v1/fill/w_311,h_405,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/Groceries.jpg">
+                <h2>Grocery Items</h2>
+                <p>Food, personal care, and cleaning items. <b>Pickup can also be arranged for larger donations.</b> Please fill out the form below to let us know in advance.</p>
+                <a target="_blank" rel="noopener noreferrer" href="https://docs.google.com/forms/d/e/1FAIpQLSdoZT2j32yZWhOKP7E6Zi8_OeisPpZLpTVgplOARhWq04NjlA/viewform?fbclid=IwY2xjawOZzLFleHRuA2FlbQIxMABicmlkETFXWkFEME15bmhNT3R3UnZWc3J0YwZhcHBfaWQQMjIyMDM5MTc4ODIwMDg5MgABHqyHbgm090cjj6hjCtiQ9NTFFiQidvMrRAKLNGAlXg03TyNGZYcFvGf18-wS_aem_emxc13Uz1nRCQ8L2wJU8Bg">  
+                    <div id="grocery-donate-button">
+                        Arrange a Grocery Donation  
+                    </div>
+                </a>
+            </div>
+
+            <div id="donation-location">
+                <p><b>Please drop off donations</b> at  El Pollo Cris Cris, 7025 Pulaski Rd, Chicago, IL 60629</p>
+                <p>Volunteers will be there to accept donations on <b>Sundays and Thursdays, from 1 - 7pm.</b></p>
+            </div>
+
+            <div id="monetary-donations">
+                <div>Monetary donations can be made via <b>Zelle</b> to innovationcenter1050@gmail.com.</div>
+                <img src="../static/images/donate-image.png">
+            </div>
         </section>
     </main>
 
-    <script src="js/script.js"></script>
+    <!-- ===== Footer ===== -->
+    <footer class="site-footer">
+        <div class="container">
+        <div class="footer-grid">
+            <img alt="Community Innovation Center"
+                src="https://static.wixstatic.com/media/c5f985_712eb51acfae41ef9dacca664413c454~mv2.png/v1/fill/w_980,h_509,al_c,q_90/transparent%20logo_edited.png" />
+            <ul class="footer-links">
+            <li><a href="mailto:innovationcenter1050@gmail.com">innovationcenter1050@gmail.com</a></li>
+            <li><a href="https://www.facebook.com/profile.php?id=61564768987902" rel="noopener">Facebook</a></li>
+            <li><a href="https://www.instagram.com/communityinnovationcenter/" rel="noopener">Instagram</a></li>
+            <li><a href="#">Terms &amp; Conditions</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            </ul>
+        </div>
+        <p class="footer-copy">Chicago, Illinois</p>
+        </div>
+    </footer>
+
+    <script src="../static/js/site.js"></script>
 </body>
 </html>
