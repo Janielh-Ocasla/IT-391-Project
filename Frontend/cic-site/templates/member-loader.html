@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CIC</title>
+</head>
+<body data-cic-page="{{ page_name }}">
+    <p id="page-status" role="status">Loading your CIC page…</p>
+    <noscript>JavaScript is required to open this page. <a href="/">Return home</a>.</noscript>
+    <script src="{{ url_for('static', filename='js/api.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/pages.js') }}" defer></script>
+</body>
+</html>

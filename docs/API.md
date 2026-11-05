@@ -70,6 +70,7 @@ API responses use `Cache-Control: no-store`.
 | POST | `/api/register` | Public | JSON `email`, `password`, `first_name`, `last_name`, optional string `phone`; currently 503 |
 | POST | `/api/signup` | Public | Alias of `/api/register`; currently 503 |
 | GET | `/api/me` | Optional token | `logged_in`, and when authenticated, `user_id`, `role` |
+| GET | `/api/pages/<page_name>` | Bearer token; admin pages require admin | Authorized completed template in `html`, or a dashboard `redirect` |
 | POST | `/api/logout` | Public | `message`; client clears its token |
 | POST | `/api/reset-password` | Public | JSON `email` → generic `message` |
 | GET | `/api/tasks` | Signed in | `tasks` |
@@ -102,6 +103,13 @@ do not reveal whether an email address exists. Supabase's reset redirect and
 password-update page still need configuration for a complete recovery flow.
 
 ## Browser client
+
+Completed member URLs initially return a neutral loader without private markup
+or data. It uses this same Bearer-token client to fetch `/api/pages/<page_name>`.
+The backend validates the Supabase identity and profile role before returning
+rendered HTML. Only completed templates are allowed. See
+[frontend integration](FRONTEND_INTEGRATION.md) for page names and routes.
+The existing authentication, cookie omission, and session behavior are unchanged.
 
 Load `/static/js/api.js` before `/static/js/site.js` on each page. All current
 served pages use this shared client and login modal.

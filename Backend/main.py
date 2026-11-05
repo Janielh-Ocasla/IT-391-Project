@@ -18,11 +18,13 @@ if __package__:
     from .account import Account
     from .announcement import Announcement
     from .assignment import Assignment
+    from .history import History
 else:
     from task import Task
     from account import Account
     from announcement import Announcement
     from assignment import Assignment
+    from history import History
 
 SITE_DIR = Path(__file__).resolve().parent.parent / "Frontend" / "cic-site"
 app = Flask(
@@ -32,6 +34,14 @@ app = Flask(
     static_url_path="/static",
 )
 app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024
+MEMBER_TEMPLATES = {
+    "member": "member.html",
+    "history": "history.html",
+    "history-admin": "history-admin.html",
+    "announcement": "announcement.html",
+    "member_donate": "member_donate.html",
+    "admin": None,
+}
 
 
 def bearer_token():
@@ -186,6 +196,119 @@ def page(name):
     if name not in {"about", "donate", "volunteer"}:
         abort(404)
     return render_template(f"{name}.html")
+
+
+@app.route("/donate", methods=["GET"])
+def donate_page():
+    return render_template("donate.html")
+
+
+@app.route("/volunteer", methods=["GET"])
+def volunteer_page():
+    return render_template("volunteer.html")
+
+
+@app.route("/member", methods=["GET"])
+@app.route("/member.html", methods=["GET"])
+def member_dashboard():
+    return render_template("member-loader.html", page_name="member")
+
+
+@app.route("/admin", methods=["GET"])
+def admin_dashboard():
+    return render_template("member-loader.html", page_name="admin")
+
+
+@app.route("/announcements", methods=["GET"])
+@app.route("/announcement", methods=["GET"])
+@app.route("/announcement.html", methods=["GET"])
+def announcements_page():
+    return render_template("member-loader.html", page_name="announcement")
+
+
+@app.route("/member_donate", methods=["GET"])
+@app.route("/member_donate.html", methods=["GET"])
+def member_donate_page():
+    return render_template("member-loader.html", page_name="member_donate")
+
+
+@app.route("/history", methods=["GET"])
+@app.route("/history.html", methods=["GET"])
+def member_history():
+    return render_template("member-loader.html", page_name="history")
+
+
+@app.route("/admin/history", methods=["GET"])
+@app.route("/history-admin", methods=["GET"])
+@app.route("/history-admin.html", methods=["GET"])
+def admin_history():
+    return render_template("member-loader.html", page_name="history-admin")
+
+
+def completed_history_rows(manager, user_id):
+    assignments = manager.service_history(user_id)
+    if assignments is None:
+        raise RuntimeError("Could not load task history")
+    rows = []
+    for assignment in assignments:
+        if assignment["status"] != "completed":
+            continue
+        task = assignment.get("tasks") or {}
+        date = (assignment.get("reviewed_at") or assignment.get("submitted_at")
+                or assignment.get("assigned_at") or "")
+        rows.append({
+            "date": date[:10],
+            "title": task.get("title") or "",
+            "status": assignment["status"],
+            "hours": float(task.get("estimated_hours") or 0),
+            "member_id": assignment["volunteer_id"],
+        })
+    return rows
+
+
+@app.route("/api/pages/<page_name>", methods=["GET"])
+def get_member_page(page_name):
+    # Only completed, explicitly listed templates can be requested. The existing
+    # API token guard rejects missing bearer tokens before client construction.
+    if page_name not in MEMBER_TEMPLATES:
+        abort(404)
+    manager = History() if page_name in {"history", "history-admin"} else Account()
+    required_role = "admin" if page_name in {"admin", "history-admin"} else None
+    user_id, error = authenticate(manager, required_role=required_role)
+    if error is not None:
+        return error
+
+    try:
+        if required_role:
+            role = required_role
+        else:
+            profile = manager.supabase.table("profiles").select("role").eq("id", user_id).single().execute()
+            role = profile.data.get("role") if profile.data else None
+        if role not in {"admin", "volunteer"}:
+            return jsonify({"error": "Account profile is unavailable"}), 403
+        if page_name == "admin" or (role == "admin" and page_name in {"member", "history"}):
+            return jsonify({"redirect": "/admin/history"}), 200
+
+        context = {}
+        if page_name == "history":
+            rows = completed_history_rows(manager, user_id)
+            context = {"member_tasks": rows, "total_hours": round(sum(row["hours"] for row in rows), 2)}
+        elif page_name == "history-admin":
+            rows = completed_history_rows(manager, user_id)
+            profiles = {}
+            if rows:
+                result = (manager.supabase.table("profiles").select("id, first_name, last_name, email")
+                          .in_("id", list({row["member_id"] for row in rows})).execute())
+                profiles = {profile["id"]: profile for profile in result.data}
+            for row in rows:
+                profile = profiles.get(row["member_id"], {})
+                name = " ".join(filter(None, (profile.get("first_name"), profile.get("last_name")))).strip()
+                row["member"] = name or profile.get("email") or row["member_id"]
+            context = {"all_tasks": rows}
+        return jsonify({"html": render_template(MEMBER_TEMPLATES[page_name], **context)}), 200
+    except Exception:
+        app.logger.exception("Could not load member page")
+        return jsonify({"error": "Could not load page"}), 500
 
 
 @app.route("/api/health", methods=["GET"])
