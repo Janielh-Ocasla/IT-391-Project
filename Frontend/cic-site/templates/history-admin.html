@@ -21,7 +21,7 @@
 
         <div class="member-header-buttons">
             <a href="/account" class="account-button">Account Settings</a>
-            <a href="/logout" class="signout-button">Sign Out</a>
+            <a href="/" class="signout-button" data-signout>Sign Out</a>
         </div>
     </header>
 
@@ -40,23 +40,23 @@
 
         <div class="dashboard-heading">
             <h1>Volunteer History</h1>
-            <p>Every completed task and volunteer hour across the organization.</p>
+            <p>Completed tasks and estimated volunteer hours across the organization. Actual time is not recorded.</p>
         </div>
 
 
         <!-- Summary numbers (calculated right here, no extra data needed) -->
         <section class="stats-row">
             <div class="stat-card">
-                <span class="stat-number">{{ all_tasks|sum(attribute='hours') }}</span>
-                <span class="stat-label">Total volunteer hours</span>
+                <span class="stat-number">{{ (all_tasks|sum(attribute='hours'))|round(2) }}</span>
+                <span class="stat-label">Total estimated volunteer hours</span>
             </div>
             <div class="stat-card">
                 <span class="stat-number">{{ all_tasks|length }}</span>
                 <span class="stat-label">Tasks completed</span>
             </div>
             <div class="stat-card">
-                <span class="stat-number">{{ all_tasks|map(attribute='member')|unique|list|length }}</span>
-                <span class="stat-label">Active volunteers</span>
+                <span class="stat-number">{{ all_tasks|map(attribute='member_id')|unique|list|length }}</span>
+                <span class="stat-label">Volunteers with completed tasks</span>
             </div>
         </section>
 
@@ -70,8 +70,8 @@
                 <label for="volunteer-filter">Show:</label>
                 <select id="volunteer-filter">
                     <option value="">All volunteers</option>
-                    {% for name in all_tasks|map(attribute='member')|unique|sort %}
-                    <option value="{{ name }}">{{ name }}</option>
+                    {% for task in all_tasks|unique(attribute='member_id')|sort(attribute='member') %}
+                    <option value="{{ task.member_id }}">{{ task.member }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -84,12 +84,12 @@
                             <th>Volunteer</th>
                             <th>Task</th>
                             <th>Status</th>
-                            <th>Hours</th>
+                            <th>Estimated hours</th>
                         </tr>
                     </thead>
                     <tbody id="history-rows">
                         {% for task in all_tasks %}
-                        <tr data-volunteer="{{ task.member }}">
+                        <tr data-volunteer="{{ task.member_id }}">
                             <td>{{ task.date }}</td>
                             <td>{{ task.member }}</td>
                             <td>{{ task.title }}</td>
@@ -126,5 +126,7 @@
         });
     </script>
 
+    <script src="{{ url_for('static', filename='js/api.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/site.js') }}" defer></script>
 </body>
 </html>
