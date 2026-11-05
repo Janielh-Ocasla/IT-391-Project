@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Task History | CIC</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/member.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/history.css') }}">
+</head>
+
+<body>
+
+    <!-- Top bar -->
+    <header class="member-header">
+        <a href="/admin" class="member-logo">
+            <img src="{{ url_for('static', filename='images/Logo.png') }}" alt="CIC Logo">
+        </a>
+
+        <div class="member-header-buttons">
+            <a href="/account" class="account-button">Account Settings</a>
+            <a href="/logout" class="signout-button">Sign Out</a>
+        </div>
+    </header>
+
+
+    <!-- Dashboard strip: change these links to match your admin pages -->
+    <nav class="dashboard-strip">
+        <a href="/admin">Home</a>
+        <a href="/announcements">Announcements</a>
+        <a href="/tasks">Tasks</a>
+        <a href="/admin/history" class="active">History</a>
+        <a href="/services">Services</a>
+    </nav>
+
+
+    <main class="history-page">
+
+        <div class="dashboard-heading">
+            <h1>Volunteer History</h1>
+            <p>Every completed task and volunteer hour across the organization.</p>
+        </div>
+
+
+        <!-- Summary numbers (calculated right here, no extra data needed) -->
+        <section class="stats-row">
+            <div class="stat-card">
+                <span class="stat-number">{{ all_tasks|sum(attribute='hours') }}</span>
+                <span class="stat-label">Total volunteer hours</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">{{ all_tasks|length }}</span>
+                <span class="stat-label">Tasks completed</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-number">{{ all_tasks|map(attribute='member')|unique|list|length }}</span>
+                <span class="stat-label">Active volunteers</span>
+            </div>
+        </section>
+
+
+        <!-- All task history -->
+        <section class="history-panel">
+            <h2>All Task History</h2>
+
+            <!-- Pick a volunteer to show only their rows -->
+            <div class="filter-bar">
+                <label for="volunteer-filter">Show:</label>
+                <select id="volunteer-filter">
+                    <option value="">All volunteers</option>
+                    {% for name in all_tasks|map(attribute='member')|unique|sort %}
+                    <option value="{{ name }}">{{ name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Volunteer</th>
+                            <th>Task</th>
+                            <th>Status</th>
+                            <th>Hours</th>
+                        </tr>
+                    </thead>
+                    <tbody id="history-rows">
+                        {% for task in all_tasks %}
+                        <tr data-volunteer="{{ task.member }}">
+                            <td>{{ task.date }}</td>
+                            <td>{{ task.member }}</td>
+                            <td>{{ task.title }}</td>
+                            <td><span class="badge">{{ task.status }}</span></td>
+                            <td>{{ task.hours }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="empty">No tasks have been completed yet.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+
+    <footer class="member-footer">
+        <p>Community Innovation Center | CIC</p>
+    </footer>
+
+
+    <!-- Filter: hides rows that don't match the chosen volunteer -->
+    <script>
+        const filter = document.getElementById("volunteer-filter");
+        filter.addEventListener("change", function () {
+            const rows = document.querySelectorAll("#history-rows tr[data-volunteer]");
+            rows.forEach(function (row) {
+                const match = filter.value === "" || row.dataset.volunteer === filter.value;
+                row.style.display = match ? "" : "none";
+            });
+        });
+    </script>
+
+</body>
+</html>
