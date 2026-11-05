@@ -1,0 +1,225 @@
+
+/* =========================================
+   MEMBER DASHBOARD
+   ========================================= */
+
+
+/* ===== Header ===== */
+
+.member-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 5%;
+    background-color: #ffffff;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.member-logo img {
+    height: 55px;
+    width: auto;
+    display: block;
+}
+
+.member-header-buttons {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.account-button,
+.signout-button {
+    text-decoration: none;
+    padding: 11px 20px;
+    border-radius: 24px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: 0.2s;
+}
+
+.account-button {
+    color: #1f5fae;
+    background-color: #e8f0fa;
+}
+
+.account-button:hover {
+    background-color: #d6e5f7;
+}
+
+.signout-button {
+    color: #ffffff;
+    background-color: #1f5fae;
+}
+
+.signout-button:hover {
+    background-color: #174a8a;
+}
+
+
+/* ===== Main Dashboard ===== */
+
+.member-dashboard {
+    max-width: 1150px;
+    margin: 0 auto;
+    padding: 55px 25px 70px;
+}
+
+.dashboard-heading {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.dashboard-heading h1 {
+    color: #1a1a1a;
+    font-size: 2rem;
+    margin: 0 0 10px;
+}
+
+.dashboard-heading p {
+    color: #5f5f5f;
+    font-size: 1rem;
+    margin: 0;
+}
+
+
+/* ===== Dashboard Cards ===== */
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+}
+
+.dashboard-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-height: 230px;
+    padding: 25px;
+    background-color: #ffffff;
+    border: 1px solid #e0e5eb;
+    border-radius: 14px;
+    text-decoration: none;
+    color: #1a1a1a;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+    border-color: #1f5fae;
+    box-shadow: 0 7px 18px rgba(31, 95, 174, 0.12);
+}
+
+
+/* Card icons */
+
+.card-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 55px;
+    height: 55px;
+    margin-bottom: 15px;
+    border-radius: 12px;
+    background-color: #e8f0fa;
+    font-size: 1.7rem;
+}
+
+
+/* Card titles */
+
+.dashboard-card h2 {
+    font-size: 1.2rem;
+    margin: 0 0 10px;
+    color: #1f5fae;
+}
+
+
+/* Card descriptions */
+
+.dashboard-card p {
+    color: #5f5f5f;
+    font-size: 0.92rem;
+    line-height: 1.5;
+    margin: 0 0 18px;
+}
+
+
+/* Card links */
+
+.card-link {
+    margin-top: auto;
+    color: #1f5fae;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+
+/* ===== Footer ===== */
+
+.member-footer {
+    padding: 20px;
+    text-align: center;
+    background-color: #f5f7fa;
+    border-top: 1px solid #e5e5e5;
+}
+
+.member-footer p {
+    color: #5f5f5f;
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+
+/* ===== Tablet Screens ===== */
+
+@media (max-width: 850px) {
+
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+}
+
+
+/* ===== Mobile Screens ===== */
+
+@media (max-width: 550px) {
+
+    .member-header {
+        padding: 12px 16px;
+    }
+
+    .member-logo img {
+        height: 42px;
+    }
+
+    .member-header-buttons {
+        gap: 6px;
+    }
+
+    .account-button,
+    .signout-button {
+        padding: 9px 12px;
+        font-size: 0.8rem;
+    }
+
+    .member-dashboard {
+        padding: 35px 16px 45px;
+    }
+
+    .dashboard-heading h1 {
+        font-size: 1.6rem;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 18px;
+    }
+
+    .dashboard-card {
+        min-height: 200px;
+    }
+
+}
