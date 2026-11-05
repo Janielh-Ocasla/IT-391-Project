@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Announcements | Community Innovation Center</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/announcement.css') }}">
+</head>
+<body>
+
+    <!-- Header: logo + the login/logout button that site.js controls -->
+    <nav class="header">
+        <div class="logo-container">
+            <a href="member.html">
+                <img src="{{ url_for('static', filename='images/Logo.png') }}" alt="Community Innovation Center Logo" class="logo">
+            </a>
+        </div>
+        <button id="login-button">Login / Sign Up</button>
+    </nav>
+
+    <main>
+        <!-- Member dashboard strip -->
+        <nav class="member-strip" aria-label="Member dashboard">
+            <a href="member.html">Home</a>
+            <a href="announcement.html" class="current" aria-current="page">Announcements</a>
+            <a href="task.html">Tasks</a>
+            <a href="history.html">History</a>
+            <a href="member_donate.html">Donate</a>
+            <a href="services.html">Service Requests</a>
+            <a href="faq.html">FAQ</a>
+        </nav>
+
+        <div class="ann-wrap">
+            <header class="ann-header">
+                <p class="ann-eyebrow">Member announcements</p>
+                <h1>What's happening at the Center</h1>
+                <p class="ann-intro">News and updates from the Community Innovation Center.</p>
+            </header>
+            <p id="ann-status" class="ann-status" role="status"></p>
+
+            <!-- Admin only: post, edit, or delete announcements (shown by announcement.js) -->
+            <form id="ann-form" class="ann-form" hidden novalidate>
+                <h2 id="ann-form-title">Post an announcement</h2>
+                <label for="ann-title">Title</label>
+                <input type="text" id="ann-title" maxlength="150" required>
+                <label for="ann-content">Message</label>
+                <textarea id="ann-content" rows="5" required></textarea>
+                <p id="ann-form-msg" class="ann-status" role="alert"></p>
+                <div class="ann-form-buttons">
+                    <button type="submit" id="ann-submit" class="btn btn-primary">Post announcement</button>
+                    <button type="button" id="ann-cancel" class="btn btn-secondary" hidden>Cancel edit</button>
+                </div>
+            </form>
+
+            <!-- Newest announcement -->
+            <div id="ann-featured" hidden>
+                <div id="ann-featured-card"></div>
+            </div>
+
+            <!-- Everything else, newest first, with search and "Show more" -->
+            <div id="ann-older" hidden>
+                <div class="ann-toolbar">
+                    <p class="ann-label">Earlier announcements</p>
+                    <input type="search" id="ann-search" class="ann-search" placeholder="Search announcements" aria-label="Search earlier announcements">
+                </div>
+                <div id="ann-list" class="ann-list"></div>
+                <p id="ann-empty" class="ann-status" hidden>No announcements match your search.</p>
+                <button type="button" id="ann-more" class="btn btn-secondary" hidden>Show more</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer (same as the About page) -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-grid">
+                <img alt="Community Innovation Center" src="{{ url_for('static', filename='images/Logo.png') }}">
+                <ul class="footer-links">
+                    <li><a href="mailto:innovationcenter1050@gmail.com">innovationcenter1050@gmail.com</a></li>
+                    <li><a href="https://www.facebook.com/profile.php?id=61564768987902" rel="noopener">Facebook</a></li>
+                    <li><a href="https://www.instagram.com/communityinnovationcenter/" rel="noopener">Instagram</a></li>
+                    <!-- TODO: link these when the Terms and Privacy pages exist -->
+                    <li><a href="#">Terms &amp; Conditions</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                </ul>
+            </div>
+            <p class="footer-copy">Chicago, Illinois</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/api.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/site.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/announcement.js') }}" defer></script>
+</body>
+</html>
