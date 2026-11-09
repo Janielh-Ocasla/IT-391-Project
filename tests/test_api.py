@@ -53,13 +53,14 @@ class ApiTests(unittest.TestCase):
         return response.json
 
     def test_pages_and_all_local_assets_are_served(self):
-        for path in ("/", "/home.html", "/index.html", "/about", "/about.html", "/donate.html", "/volunteer.html"):
+        for path in ("/", "/home.html", "/index.html", "/about", "/about.html", "/donate", "/donate.html", "/volunteer", "/volunteer.html"):
             with self.subTest(path=path):
                 response = self.client.get(path)
                 self.assertEqual(response.status_code, 200)
                 html = response.get_data(as_text=True)
                 self.assertIn("/static/js/api.js", html)
                 self.assertIn("/static/js/site.js", html)
+                self.assertLess(html.index("/static/js/api.js"), html.index("/static/js/site.js"))
                 parser = Assets()
                 parser.feed(html)
                 for asset in parser.urls:

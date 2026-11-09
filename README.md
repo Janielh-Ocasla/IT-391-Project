@@ -59,6 +59,9 @@ and response shapes. The shared browser client is
 - Protected endpoints require `Authorization: Bearer <access_token>`.
 - Login stores the access token in the browser tab's `sessionStorage`; requests
   attach it automatically. Flask session cookies are not used for authentication.
+- Completed member pages load through the existing Bearer-token API. Initial page
+  URLs contain only a neutral loader; protected templates and History data require
+  authorization. See [frontend integration](docs/FRONTEND_INTEGRATION.md).
 - Registration remains paused pending the existing Auth/Profile setup decision.
 
 # Tests
@@ -67,7 +70,7 @@ The tests mock Supabase; they do not modify live data or send reset emails.
 
 ```sh
 python -m unittest discover -s tests -v
-node --test tests/api-client.test.cjs
+node --test tests/*.test.cjs
 ```
 
 Node.js is only needed for the browser-client tests, not to run the application.

@@ -1,0 +1,117 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Member Dashboard | CIC</title>
+
+    <!-- Shared website styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}">
+
+    <!-- Member dashboard styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/member.css') }}">
+</head>
+
+<body>
+
+    <!-- Top navigation bar -->
+    <header class="member-header">
+
+        <a href="/" class="member-logo">
+            <img src="{{ url_for('static', filename='images/Logo.png') }}" alt="CIC Logo">
+        </a>
+
+        <div class="member-header-buttons">
+            <a href="/account" class="account-button">
+                Account Settings
+            </a>
+
+            <a href="/" class="signout-button" data-signout>
+                Sign Out
+            </a>
+        </div>
+
+    </header>
+
+
+    <!-- Main dashboard content -->
+    <main class="member-dashboard">
+
+        <div class="dashboard-heading">
+            <h1>Member Dashboard</h1>
+            <p>Welcome to your CIC volunteer portal. What would you like to do today?</p>
+        </div>
+
+
+        <!-- Dashboard sections -->
+        <section class="dashboard-grid">
+
+            <!-- Announcements -->
+            <a href="/announcements" class="dashboard-card">
+                <div class="card-icon">📢</div>
+                <h2>Announcements</h2>
+                <p>Stay updated with the latest CIC news and announcements.</p>
+                <span class="card-link">View Announcements →</span>
+            </a>
+
+
+            <!-- Tasks -->
+            <a href="/tasks" class="dashboard-card">
+                <div class="card-icon">📋</div>
+                <h2>Tasks</h2>
+                <p>View your assigned volunteer tasks and update your progress.</p>
+                <span class="card-link">View Tasks →</span>
+            </a>
+
+
+            <!-- History -->
+            <a href="/history" class="dashboard-card">
+                <div class="card-icon">🕒</div>
+                <h2>History</h2>
+                <p>View your completed tasks and estimated volunteer hours.</p>
+                <span class="card-link">View History →</span>
+            </a>
+
+
+            <!-- Donate -->
+            <a href="/member_donate" class="dashboard-card">
+                <div class="card-icon">❤️</div>
+                <h2>Donate</h2>
+                <p>Support the Community Innovation Center and its mission.</p>
+                <span class="card-link">Learn More →</span>
+            </a>
+
+
+            <!-- Services -->
+            <a href="/services" class="dashboard-card">
+                <div class="card-icon">🤝</div>
+                <h2>Services</h2>
+                <p>Explore services and submit a service request.</p>
+                <span class="card-link">View Services →</span>
+            </a>
+
+
+            <!-- FAQ / Help -->
+            <a href="/faq" class="dashboard-card">
+                <div class="card-icon">❓</div>
+                <h2>FAQ / Help</h2>
+                <p>Find answers to common questions or get help.</p>
+                <span class="card-link">Get Help →</span>
+            </a>
+
+        </section>
+
+    </main>
+
+
+    <!-- Footer -->
+    <footer class="member-footer">
+        <p>Community Innovation Center | CIC</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/api.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/site.js') }}" defer></script>
+</body>
+</html>

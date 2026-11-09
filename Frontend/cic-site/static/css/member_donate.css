@@ -1,0 +1,124 @@
+/* =====================================================
+   Member donate page styles
+   (header, buttons and the login popup are in style.css / site.css)
+   ===================================================== */
+
+/* ---------- Member dashboard strip ---------- */
+.member-strip {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;   
+  gap: 8px 24px;
+  padding: 14px 24px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+}
+.member-strip a {
+  padding: 4px 0;
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+}
+.member-strip a:hover { color: var(--accent); }
+.member-strip a.current { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* ---------- Page layout ---------- */
+.give-wrap {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+}
+.give-wrap h1 {
+  margin: 0 0 8px;
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+}
+.give-intro { margin: 0 0 28px; color: var(--muted); line-height: 1.6; }
+.give-wrap h1,
+.give-intro { text-align: center; }
+
+/* ---------- Donation cards ---------- */
+.give-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+.give-card {
+  display: flex;
+  flex-direction: column;
+  padding: 28px 24px;
+  background: #fff;
+  border: 1px solid #e3e8ef;
+  border-radius: 22px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+}
+.give-card { transition: transform 0.15s ease, box-shadow 0.15s ease; }
+.give-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08); }
+.give-photo {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;      /* same shape for both cards */
+  margin-bottom: 18px;
+  object-fit: cover;        
+  border-radius: 16px;
+}
+.give-card h2 { margin: 0 0 10px; font-size: 1.2rem; }
+.give-card p { margin: 0 0 20px; color: var(--muted); line-height: 1.6; }
+.give-card .btn { margin-top: auto; text-align: center; }
+
+/* ---------- Drop-off + Zelle info boxes ---------- */
+.info-grid {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 24px;
+  margin-top: 32px;
+}
+.info-box {
+  padding: 24px;
+  background: var(--accent-soft);
+  border-left: 6px solid var(--accent);
+  border-radius: 0 18px 18px 0;
+}
+.info-box h2 { margin: 0 0 10px; font-size: 1.2rem; }
+.info-box p { margin: 10px 0 0; line-height: 1.6; }
+.info-box address { font-style: normal; line-height: 1.6; font-weight: 600; }
+.zelle-email { font-weight: 700; overflow-wrap: anywhere; }
+.copy-msg { margin-left: 12px; font-size: 0.9rem; color: #1a7f37; }
+
+/* in case site.css doesn't define these */
+.btn-small { padding: 8px 16px; font-size: 0.9rem; }
+.btn-secondary { background: #fff; color: var(--accent-dark); border: 2px solid var(--accent); }
+.btn-secondary:hover { background: var(--accent-soft); }
+[hidden] { display: none !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  .give-card { transition: none; }
+  .give-card:hover { transform: none; }
+}
+
+@media (max-width: 760px) {
+  .give-grid,
+  .info-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .give-wrap { padding: 24px 16px 48px; }
+}
+
+/* "See Drop-off Details" button scrolls smoothly and stops below the fixed header */
+html { scroll-behavior: smooth; }
+.info-box { scroll-margin-top: 140px; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
+/* ---------- Footer ---------- */
+/* Keeps the footer at the bottom even when the page is short */
+body { display: flex; flex-direction: column; min-height: 100vh; }
+main { flex: 1 0 auto; }
+
+.site-footer { background: #14233a; color: #cfd8e6; padding: 40px 0; }
+.footer-inner { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+.footer-grid { display: flex; flex-wrap: wrap; gap: 24px 48px; justify-content: space-between; align-items: center; }
+.site-footer a { color: #fff; }
+.site-footer img { height: 44px; width: auto; background: #fff; border-radius: 10px; padding: 4px 8px; }
+.footer-links { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 0; padding: 0; list-style: none; }
+.footer-copy { margin: 24px 0 0; font-size: 0.85rem; color: #9fb0c8; }
