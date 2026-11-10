@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Donate | Community Innovation Center</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/member_donate.css') }}">
+</head>
+<body>
+
+    <!-- Header: logo + the login/logout button that site.js controls -->
+    <nav class="header">
+        <div class="logo-container">
+            <a href="member.html">
+                <img src="{{ url_for('static', filename='images/Logo.png') }}" alt="Community Innovation Center Logo" class="logo">
+            </a>
+        </div>
+        <button id="login-button">Login / Sign Up</button>
+        <div class="account-menu" data-account-menu hidden>
+            <button type="button" class="account-trigger" aria-haspopup="true" aria-expanded="false">
+                <span class="account-avatar" aria-hidden="true">👤</span>
+                <span class="account-label">Account</span>
+                <span class="account-caret" aria-hidden="true">▾</span>
+            </button>
+            <div class="account-dropdown" role="menu">
+                <div class="account-dropdown-head">
+                    <span class="account-avatar lg" aria-hidden="true">👤</span>
+                    <div>
+                        <p class="account-name">Your account</p>
+                        <p class="account-role" data-account-role>Signed in</p>
+                    </div>
+                </div>
+                <a href="/account" class="account-item" role="menuitem"><span class="ico">⚙️</span> Account settings</a>
+                <button type="button" class="account-item" role="menuitem" data-account-reset><span class="ico">🔑</span> Reset password</button>
+                <div class="account-reset" hidden>
+                    <form id="account-reset-form">
+                        <input type="email" placeholder="Your email address" aria-label="Email for reset link" required>
+                        <button type="submit">Send reset link</button>
+                    </form>
+                    <p id="account-reset-msg" class="account-msg" role="status"></p>
+                </div>
+                <a href="/account#profile" class="account-item" role="menuitem"><span class="ico">👤</span> Edit profile</a>
+                <a href="/account#notifications" class="account-item" role="menuitem"><span class="ico">🔔</span> Notification preferences</a>
+                <a href="/faq" class="account-item" role="menuitem"><span class="ico">❓</span> Help &amp; FAQ</a>
+                <div class="account-divider"></div>
+                <a href="/" class="account-item danger" role="menuitem" data-signout><span class="ico">↩</span> Sign out</a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <!-- Member dashboard strip -->
+        <nav class="member-strip" aria-label="Member dashboard">
+            <a href="member.html">Home</a>
+            <a href="announcement.html">Announcements</a>
+            <a href="task.html">Tasks</a>
+            <a href="history.html">History</a>
+            <a href="member_donate.html" class="current" aria-current="page">Donate</a>
+            <a href="services.html">Service Requests</a>
+            <a href="faq.html">FAQ</a>
+        </nav>
+
+        <div class="give-wrap">
+            <h1>Member Donations</h1>
+            <p class="give-intro">We welcome any contributions for our current initiatives! Every little bit helps.</p>
+
+            <!-- Grocery button uses the CIC Google Form. Coats button scrolls to the drop-off box. -->
+            <div class="give-grid">
+                <article class="give-card">
+                    <img class="give-photo" src="{{ url_for('static', filename='images/Groceries.jpg') }}" alt="A box of canned goods, pasta, and dried beans" loading="lazy">
+                    <h2>Grocery Items</h2>
+                    <p>
+                        Food, personal care, and cleaning items.
+                        <strong>Pickup can also be arranged for larger donations.</strong>
+                        Please fill out the form to let us know in advance.
+                    </p>
+                    <a class="btn btn-primary" href="https://docs.google.com/forms/d/e/1FAIpQLSdoZT2j32yZWhOKP7E6Zi8_OeisPpZLpTVgplOARhWq04NjlA/viewform" target="_blank" rel="noopener">Arrange a Grocery Donation</a>
+                </article>
+
+                <article class="give-card">
+                    <img class="give-photo" src="{{ url_for('static', filename='images/GreenWinterCoat.jpg') }}" alt="A green winter coat with a hood" loading="lazy">
+                    <h2>Winter Coats</h2>
+                    <p>Contribute to our winter coat drive. Bring coats to the drop-off location below during volunteer hours. No form needed.</p>
+                    <a class="btn btn-primary" href="#dropoff">See Drop-off Details</a>
+                </article>
+            </div>
+
+            <section class="info-grid">
+                <div class="info-box dropoff" id="dropoff">
+                    <h2>Drop-off location &amp; hours</h2>
+                    <address>El Pollo Cris Cris<br>7025 S Pulaski Rd<br>Chicago, IL 60629</address>
+                    <p>Volunteers will be there to accept donations on <strong>Sundays and Thursdays, from 1 &ndash; 7pm</strong>.</p>
+                </div>
+
+                <div class="info-box zelle">
+                    <h2>Monetary donations</h2>
+                    <p>Send a donation via <strong>Zelle</strong> to:</p>
+                    <p class="zelle-email" id="zelle-email">innovationcenter1050@gmail.com</p>
+                    <!-- shown by member_donate.js -->
+                    <button type="button" id="zelle-copy" class="btn btn-secondary btn-small" hidden>Copy email</button>
+                    <span id="zelle-copy-msg" class="copy-msg" role="status"></span>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer (same as the About page) -->
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-grid">
+                <img alt="Community Innovation Center" src="{{ url_for('static', filename='images/Logo.png') }}">
+                <ul class="footer-links">
+                    <li><a href="mailto:innovationcenter1050@gmail.com">innovationcenter1050@gmail.com</a></li>
+                    <li><a href="https://www.facebook.com/profile.php?id=61564768987902" rel="noopener">Facebook</a></li>
+                    <li><a href="https://www.instagram.com/communityinnovationcenter/" rel="noopener">Instagram</a></li>
+                    <!-- TODO: link these when the Terms and Privacy pages exist -->
+                    <li><a href="#">Terms &amp; Conditions</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                </ul>
+            </div>
+            <p class="footer-copy">Chicago, Illinois</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/api.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/site.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/account-menu.js') }}" defer></script>
+    <!-- powers the "Copy email" button -->
+    <script src="{{ url_for('static', filename='js/member_donate.js') }}" defer></script>
+</body>
+</html>
