@@ -1,0 +1,128 @@
+/* =====================================================
+   Task page styles
+   (header, buttons and login popup are in style.css / site.css)
+   ===================================================== */
+
+[hidden] { display: none !important; }
+
+/* ---------- Member dashboard strip ---------- */
+.member-strip {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  gap: 8px 24px;
+  padding: 14px 24px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+}
+.member-strip a {
+  padding: 4px 0;
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+}
+.member-strip a:hover { color: var(--accent); }
+.member-strip a.current { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* ---------- Page layout ---------- */
+.task-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+}
+.task-header { margin-bottom: 20px; text-align: center; }
+.task-eyebrow {
+  margin: 0 0 8px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.task-header h1 {
+  margin: 0 0 6px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  line-height: 1.1;
+}
+.task-intro { margin: 0; color: var(--muted); line-height: 1.6; }
+
+/* ---------- Search bar (centered, like the mockup) ---------- */
+.task-searchbar { display: flex; justify-content: center; margin: 24px 0; }
+.task-search {
+  width: min(100%, 520px);
+  padding: 12px 18px;
+  font: inherit;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  outline: none;
+}
+.task-search:focus {
+  border-color: var(--focus);
+  box-shadow: 0 0 0 2px rgba(0, 116, 232, 0.25);
+}
+
+.task-status { min-height: 1.3em; margin: 0 0 16px; text-align: center; color: var(--muted); }
+.task-status.error { color: #c00; }
+
+/* ---------- Two-column panels ---------- */
+.task-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+}
+.task-panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 20px;
+  min-height: 420px;
+}
+.panel-title {
+  margin: 0 0 16px;
+  font-size: 1.2rem;
+  color: var(--accent-dark);
+  border-bottom: 2px solid var(--accent);
+  padding-bottom: 8px;
+}
+.panel-body { display: grid; gap: 14px; }
+.panel-empty { margin: 12px 0 0; color: var(--muted); font-size: 0.95rem; }
+
+/* ---------- Cards inside the panels ---------- */
+.task-card {
+  background: #fff;
+  border: 1px solid #e3e8ef;
+  border-radius: 14px;
+  padding: 16px 18px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.task-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07); }
+.task-card h3 { margin: 0 0 6px; font-size: 1.05rem; color: var(--text); }
+.task-card .task-meta { margin: 0 0 10px; font-size: 0.85rem; color: var(--muted); }
+.task-card .task-desc { margin: 0 0 12px; line-height: 1.5; font-size: 0.95rem; }
+.task-card .btn-pick {
+  display: inline-block;
+  font: inherit;
+  font-weight: 600;
+  border: none;
+  border-radius: 999px;
+  padding: 8px 18px;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+}
+.task-card .btn-pick:hover { background: var(--accent-dark); }
+.task-card .btn-pick:disabled { opacity: 0.6; cursor: default; }
+
+@media (prefers-reduced-motion: reduce) {
+  .task-card { transition: none; }
+  .task-card:hover { transform: none; }
+}
+
+/* Stack to one column on narrow screens */
+@media (max-width: 760px) {
+  .task-columns { grid-template-columns: 1fr; }
+  .task-wrap { padding: 24px 16px 48px; }
+}
