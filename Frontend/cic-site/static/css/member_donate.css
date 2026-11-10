@@ -31,6 +31,7 @@
 .give-wrap h1 {
   margin: 0 0 8px;
   font-size: clamp(1.8rem, 3vw, 2.4rem);
+  font-family: Georgia, "Times New Roman", serif;
 }
 .give-intro { margin: 0 0 28px; color: var(--muted); line-height: 1.6; }
 .give-wrap h1,
@@ -109,16 +110,3 @@ html { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
 }
-
-/* ---------- Footer ---------- */
-/* Keeps the footer at the bottom even when the page is short */
-body { display: flex; flex-direction: column; min-height: 100vh; }
-main { flex: 1 0 auto; }
-
-.site-footer { background: #14233a; color: #cfd8e6; padding: 40px 0; }
-.footer-inner { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
-.footer-grid { display: flex; flex-wrap: wrap; gap: 24px 48px; justify-content: space-between; align-items: center; }
-.site-footer a { color: #fff; }
-.site-footer img { height: 44px; width: auto; background: #fff; border-radius: 10px; padding: 4px 8px; }
-.footer-links { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 0; padding: 0; list-style: none; }
-.footer-copy { margin: 24px 0 0; font-size: 0.85rem; color: #9fb0c8; }
