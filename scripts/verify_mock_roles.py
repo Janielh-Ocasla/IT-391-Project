@@ -66,13 +66,12 @@ Every test gets a fresh copy of the fixture.
 {evidence['passed']} / {result.testsRun} scenario checks passed;
 {evidence['failed']} failed; {evidence['errors']} errors.
 
-**Passing the checks below does not mean registration is enabled.** Some checks
-verify and document a blocked or missing feature, as identified in this table.
+Passing the checks below verifies the application against the mock; it does not
+verify the configuration of a live Supabase project.
 
 | Feature | Volunteer | Admin | Level of verification |
 | --- | --- | --- | --- |
-| Public registration | BLOCKED: `/api/register` and `/api/signup` return 503 | BLOCKED: same 503; no separate Admin signup route | Actual Flask routes with mock data |
-| Account creation method | Creates a Volunteer when Auth and profile writes succeed | Method always assigns `volunteer`; Admin is pre-seeded for other tests | Business module only; not public registration |
+| Public registration | Both signup routes create a volunteer profile through the mocked Auth trigger | No separate Admin signup; public signup cannot grant Admin access | Actual Flask routes with mock data |
 | Login and current identity | PASS for both seeded Volunteers | PASS for seeded Admin | Real routes and Account code, mock Auth |
 | Task visibility | Only open, undeleted tasks | All undeleted tasks | Real route and Task queries |
 | Pick / cancel | PASS, including reopening for another Volunteer | 403 for Volunteer-only routes | Real route and row mutations |
@@ -80,9 +79,9 @@ verify and document a blocked or missing feature, as identified in this table.
 | Delivery review | Cannot review: 403 | Approve, reject, resubmit, approve: PASS | Assignment and task states checked |
 | Assignment scope | Can see own rows; cannot mutate another Volunteer's work | Can see everyone's assignments | Filters checked without simulated RLS hiding mistakes |
 | Announcements | Can read; create/edit/delete return 403 | Create, edit, delete: PASS | Real routes and announcement rows |
-| Task CRUD | Denied by business module | Module works; create/detail/edit/delete API routes are NOT EXPOSED (405/404) | Module and route availability checked separately |
-| History / volunteer hours | Module scopes records to self | Module supports Admin lookup | Module only; `/api/history` and `/api/hours` return 404 |
-| Profile edit | Partial update preserves omitted fields after fix | Same Account method | Module only; no profile-edit API is exposed |
+| Task management | Can read open tasks; create/edit/delete return 403 | Can create, read, edit, and soft-delete tasks | Real routes and task rows |
+| History / estimated hours | Own records only | Can look up volunteers; history also supports an unfiltered lookup | Real routes and assignment rows |
+| Profile edit | Own name and phone; omitted fields are preserved | Same own-profile endpoint | Real route and profile rows |
 | Password reset / logout | Mock reset call and logout route work | Logout route works | No real email, token revocation, or recovery page tested |
 
 ## Defects reproduced and fixed
@@ -95,21 +94,18 @@ verify and document a blocked or missing feature, as identified in this table.
    HTTP 409 before touching Storage. The regression test also checks that no image
    or assignment data is changed.
 
-## Registration gap that remains
+## Registration and profiles
 
-The public API deliberately remains paused. The mock also reproduces a separate
-failure case in the existing Account method: Auth signup succeeds, profile insert
-fails, and an Auth record remains without a profile. No rollback is implemented.
-This is a simulated profile write failure, **not proof of the live project's RLS
-or trigger configuration**. Admin enrollment and Auth/Profile synchronization
-still need an explicit implementation before enabling registration.
+The signup routes rely on the configured Supabase Auth trigger to create
+volunteer profiles. The mock tests exercise email confirmation, duplicate
+registration, and rollback when profile creation fails. Updating a profile's
+name or phone does not modify the account's login email or role.
 
 ## Limits
 
 The mock models the repository's database calls and shared state, not Supabase's
 actual RLS policies, mail delivery, email confirmation links, database constraints,
-Storage bucket settings, concurrency, or browser dashboards. Seeded Admin/Volunteer
-accounts do not establish that either role can publicly register. Live Auth/Storage
+Storage bucket settings, concurrency, or browser dashboards. Live Auth/Storage
 flows still need separate verification using confirmed test accounts.
 
 ## Reproduce
@@ -117,7 +113,7 @@ flows still need separate verification using confirmed test accounts.
 ```sh
 python -m scripts.verify_mock_roles
 python -m unittest discover -s tests -v
-node --test tests/api-client.test.cjs
+node --test tests/*.test.cjs
 ```
 
 Machine-readable observations: [mock_verification.json](mock_verification.json).

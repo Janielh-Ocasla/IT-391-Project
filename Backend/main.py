@@ -161,6 +161,20 @@ def authenticate(manager, required_role=None):
     return user_id, None
 
 
+def authenticate_profile(manager):
+    """Verify a token and require a recognized CIC profile."""
+    user_id, error = authenticate(manager)
+    if error is not None:
+        return None, None, error
+
+    profiles = (manager.supabase.table("profiles").select("role")
+                .eq("id", user_id).limit(1).execute().data)
+    role = profiles[0].get("role") if profiles else None
+    if role not in {"admin", "volunteer"}:
+        return None, None, (jsonify({"error": "Account profile is unavailable"}), 403)
+    return user_id, role, None
+
+
 # ==================================================
 # SHARED VALIDATION
 # ==================================================
@@ -173,6 +187,28 @@ def valid_uuid(value):
 
     except (ValueError, TypeError, AttributeError):
         return False
+
+
+def read_text_fields(allowed, *, required=(), allow_blank=()):
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        abort(400, description="Invalid JSON body")
+    if data.keys() - set(allowed):
+        abort(400, description=f"Only these fields can be sent: {', '.join(allowed)}")
+    for field in required:
+        if field not in data:
+            abort(400, description=f"{field} is required")
+    if not data:
+        abort(400, description="No fields provided")
+    fields = {}
+    for field, value in data.items():
+        if not isinstance(value, str):
+            abort(400, description=f"{field} must be a string")
+        value = value.strip()
+        if not value and field not in allow_blank:
+            abort(400, description=f"{field} cannot be empty")
+        fields[field] = value
+    return fields
 
 
 # ==================================================
@@ -486,6 +522,27 @@ def reset_password():
     return jsonify({"message": "If the account exists, a reset link will be sent"}), 200
 
 
+@app.patch("/api/profile")
+def update_profile_api():
+    try:
+        manager = Account()
+        user_id, _, error = authenticate_profile(manager)
+        if error is not None:
+            return error
+
+        fields = read_text_fields(("first_name", "last_name", "phone"), allow_blank=("phone",))
+        updated = manager.update_profile(user_id, **fields)
+        if not updated:
+            return jsonify({"error": "Failed to update profile"}), 500
+        profile = {key: updated[0].get(key) for key in ("id", "email", "first_name", "last_name", "phone")}
+        return jsonify({"profile": profile}), 200
+    except HTTPException:
+        raise
+    except Exception:
+        app.logger.exception("Failed to update profile")
+        return jsonify({"error": "Failed to update profile"}), 500
+
+
 # ==================================================
 # TASKS - LIST
 # ==================================================
@@ -515,6 +572,105 @@ def get_tasks():
         return jsonify({
             "error": "Failed to load tasks"
         }), 500
+
+
+@app.post("/api/tasks")
+def create_task_api():
+    try:
+        manager = Task()
+        user_id, error = authenticate(manager, required_role="admin")
+        if error is not None:
+            return error
+
+        fields = read_text_fields(("title", "description"), required=("title",), allow_blank=("description",))
+        task = manager.create_task(user_id, **fields)
+        if not task:
+            return jsonify({"error": "Failed to create task"}), 500
+        return jsonify({"task": task}), 201
+    except HTTPException:
+        raise
+    except Exception:
+        app.logger.exception("Failed to create task")
+        return jsonify({"error": "Failed to create task"}), 500
+
+
+@app.route("/api/tasks/<task_id>", methods=["GET", "PUT", "PATCH", "DELETE"])
+def task_detail_api(task_id):
+    try:
+        manager = Task()
+        read_only = request.method in {"GET", "HEAD"}
+        if read_only:
+            user_id, role, error = authenticate_profile(manager)
+        else:
+            user_id, error = authenticate(manager, required_role="admin")
+        if error is not None:
+            return error
+        if not valid_uuid(task_id):
+            return jsonify({"error": "Invalid task ID"}), 400
+        task_id = str(UUID(task_id))
+
+        if read_only:
+            task = manager.task_info(task_id, open_only=(role == "volunteer"))
+        elif request.method == "DELETE":
+            deleted = manager.delete_task(user_id, task_id)
+            if deleted is None:
+                return jsonify({"error": "Task not found"}), 404
+            if not deleted:
+                return jsonify({"error": "Failed to delete task"}), 500
+            return jsonify({"message": "Task deleted successfully"}), 200
+        else:
+            fields = read_text_fields(("title", "description"), allow_blank=("description",))
+            task = manager.edit_task(user_id, task_id, **fields)
+
+        if task is None:
+            return jsonify({"error": "Task not found"}), 404
+        if not task:
+            return jsonify({"error": "Failed to update task"}), 500
+        return jsonify({"task": task}), 200
+    except HTTPException:
+        raise
+    except Exception:
+        app.logger.exception("Could not process task request")
+        return jsonify({"error": "Could not process task request"}), 500
+
+
+# ==================================================
+# SERVICE HISTORY AND ESTIMATED VOLUNTEER HOURS
+# ==================================================
+
+@app.get("/api/history")
+@app.get("/api/hours")
+def service_records_api():
+    hours_only = request.path == "/api/hours"
+    try:
+        manager = History()
+        user_id, role, error = authenticate_profile(manager)
+        if error is not None:
+            return error
+
+        volunteer_id = request.args.get("volunteer_id")
+        if volunteer_id is not None:
+            if not valid_uuid(volunteer_id):
+                return jsonify({"error": "Invalid volunteer ID"}), 400
+            volunteer_id = str(UUID(volunteer_id))
+        if role == "volunteer":
+            if volunteer_id is not None and volunteer_id != user_id:
+                return jsonify({"error": "Volunteers can only view their own records"}), 403
+            volunteer_id = user_id
+        elif hours_only and volunteer_id is None:
+            return jsonify({"error": "volunteer_id is required for admin hour lookups"}), 400
+
+        if hours_only:
+            result = manager.track_volunteer_hours(user_id, volunteer_id=volunteer_id)
+            if result is not None:
+                return jsonify(result), 200
+        else:
+            result = manager.service_history(user_id, volunteer_id=volunteer_id)
+            if result is not None:
+                return jsonify({"history": result}), 200
+    except Exception:
+        app.logger.exception("Failed to load service records")
+    return jsonify({"error": "Failed to load service records"}), 500
 
 
 # ==================================================

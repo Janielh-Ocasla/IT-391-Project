@@ -3,18 +3,18 @@
   "network_allowed": false,
   "real_database_writes": 0,
   "fixture": "tests/fixtures/role_scenarios.json",
-  "tests_run": 23,
-  "passed": 23,
+  "tests_run": 30,
+  "passed": 30,
   "failed": 0,
   "errors": 0,
   "tests": [
     {
-      "test": "test_account_method_can_create_volunteer_when_profile_insert_succeeds",
-      "description": "Module only: volunteer creation, profile normalization, and later API login work.",
+      "test": "test_account_method_sends_normalized_metadata_for_profile_trigger",
+      "description": "Account sends normalized signup metadata; the trigger creates the profile.",
       "status": "PASS",
       "observations": [
         "public POST /api/login: HTTP 200",
-        "Account.create_account created an Auth record and a volunteer profile; public registration remains blocked."
+        "Account passed normalized names/phone as Auth metadata without inserting a profile; the mock trigger created it."
       ]
     },
     {
@@ -24,8 +24,8 @@
       "observations": [
         "admin POST /api/announcements: HTTP 201",
         "alice GET /api/announcements: HTTP 200",
-        "admin PUT /api/announcements/311e5ee0-c8cb-45b2-ae63-81571c97866f: HTTP 200",
-        "admin DELETE /api/announcements/311e5ee0-c8cb-45b2-ae63-81571c97866f: HTTP 200"
+        "admin PUT /api/announcements/2fa351bf-554a-4a04-a520-073f4613c115: HTTP 200",
+        "admin DELETE /api/announcements/2fa351bf-554a-4a04-a520-073f4613c115: HTTP 200"
       ]
     },
     {
@@ -47,21 +47,28 @@
         "alice POST /api/tasks/20000000-0000-4000-8000-000000000001/pick: HTTP 201",
         "alice POST /api/tasks/20000000-0000-4000-8000-000000000001/photo: HTTP 200",
         "alice POST /api/tasks/20000000-0000-4000-8000-000000000001/submit: HTTP 200",
-        "admin POST /api/assignments/4c43247e-4f56-4340-bb40-e7afc1419afa/verify: HTTP 200",
+        "admin POST /api/assignments/a4f44be1-9709-4928-8f09-7eb3365122ba/verify: HTTP 200",
         "alice POST /api/tasks/20000000-0000-4000-8000-000000000001/photo: HTTP 200",
         "alice POST /api/tasks/20000000-0000-4000-8000-000000000001/submit: HTTP 200",
-        "admin POST /api/assignments/4c43247e-4f56-4340-bb40-e7afc1419afa/verify: HTTP 200"
+        "admin POST /api/assignments/a4f44be1-9709-4928-8f09-7eb3365122ba/verify: HTTP 200"
       ]
     },
     {
-      "test": "test_admin_task_crud_module_and_missing_api_routes",
-      "description": "Module CRUD works and enforces roles; task creation/detail/edit/delete APIs are missing.",
+      "test": "test_admin_task_lifecycle_through_api",
+      "description": "Admin can publish, view, edit, and soft-delete a task through the API.",
       "status": "PASS",
       "observations": [
-        "admin POST /api/tasks: HTTP 405",
-        "admin GET /api/tasks/90c24fbf-2c01-4316-bc67-0f83f2d4851f: HTTP 404",
-        "admin PUT /api/tasks/90c24fbf-2c01-4316-bc67-0f83f2d4851f: HTTP 404",
-        "admin DELETE /api/tasks/90c24fbf-2c01-4316-bc67-0f83f2d4851f: HTTP 404"
+        "admin POST /api/tasks: HTTP 201",
+        "alice GET /api/tasks/62b4d9f4-58aa-49da-98ac-3a46f97f3e3b: HTTP 200",
+        "admin PUT /api/tasks/62b4d9f4-58aa-49da-98ac-3a46f97f3e3b: HTTP 200",
+        "admin PATCH /api/tasks/62b4d9f4-58aa-49da-98ac-3a46f97f3e3b: HTTP 200",
+        "admin DELETE /api/tasks/62b4d9f4-58aa-49da-98ac-3a46f97f3e3b: HTTP 200",
+        "admin GET /api/tasks/62b4d9f4-58aa-49da-98ac-3a46f97f3e3b: HTTP 404",
+        "admin GET /api/tasks: HTTP 200",
+        "alice GET /api/tasks/62b4d9f4-58aa-49da-98ac-3a46f97f3e3b: HTTP 404",
+        "alice GET /api/tasks: HTTP 200",
+        "admin PATCH /api/tasks/62b4d9f4-58aa-49da-98ac-3a46f97f3e3b: HTTP 404",
+        "admin DELETE /api/tasks/62b4d9f4-58aa-49da-98ac-3a46f97f3e3b: HTTP 404"
       ]
     },
     {
@@ -84,6 +91,12 @@
         "bob GET /api/assignments/status: HTTP 200",
         "admin GET /api/assignments/status: HTTP 200"
       ]
+    },
+    {
+      "test": "test_auth_profile_trigger_ignores_role_in_user_metadata",
+      "description": "Even direct mock Auth signup metadata cannot assign an Admin profile role.",
+      "status": "PASS",
+      "observations": []
     },
     {
       "test": "test_both_roles_login_and_me_uses_returned_token",
@@ -114,16 +127,40 @@
       "description": "Duplicate email registration through the account module is rejected.",
       "status": "PASS",
       "observations": [
-        "Duplicate Auth email rejected; Auth/profile counts unchanged."
+        "Duplicate Auth email rejected; existing Auth/profile data unchanged."
       ]
     },
     {
-      "test": "test_history_and_hours_modules_respect_volunteer_scope",
-      "description": "History/hours modules restrict Volunteer to own records and allow Admin lookup.",
+      "test": "test_duplicate_email_through_both_aliases_preserves_existing_account",
+      "description": "Case/whitespace variants of an existing email fail without changing its data.",
       "status": "PASS",
       "observations": [
-        "alice GET /api/history: HTTP 404",
-        "alice GET /api/hours: HTTP 404"
+        "public POST /api/register: HTTP 500",
+        "public POST /api/signup: HTTP 500",
+        "public POST /api/login: HTTP 200"
+      ]
+    },
+    {
+      "test": "test_history_and_hours_api_scope",
+      "description": "Volunteers see only their own records; Admin can look up any volunteer.",
+      "status": "PASS",
+      "observations": [
+        "bob POST /api/tasks/20000000-0000-4000-8000-000000000003/cancel: HTTP 200",
+        "alice GET /api/history: HTTP 200",
+        "alice GET /api/hours: HTTP 200",
+        "admin GET /api/history: HTTP 200",
+        "admin GET /api/hours: HTTP 200",
+        "bob GET /api/history: HTTP 200",
+        "bob GET /api/hours: HTTP 200",
+        "admin GET /api/history: HTTP 200",
+        "admin GET /api/hours: HTTP 200",
+        "admin GET /api/history: HTTP 200",
+        "admin GET /api/hours: HTTP 400",
+        "alice GET /api/history: HTTP 403",
+        "admin GET /api/history: HTTP 400",
+        "alice GET /api/hours: HTTP 403",
+        "admin GET /api/hours: HTTP 400",
+        "admin GET /api/history: HTTP 200"
       ]
     },
     {
@@ -137,6 +174,12 @@
       ]
     },
     {
+      "test": "test_late_profile_trigger_failure_rolls_back_both_rows",
+      "description": "A trigger error after the profile write also restores the complete transaction.",
+      "status": "PASS",
+      "observations": []
+    },
+    {
       "test": "test_other_volunteers_assignment_cannot_be_cancelled_or_submitted",
       "description": "Volunteer cannot cancel or submit another volunteer's assignment.",
       "status": "PASS",
@@ -147,10 +190,11 @@
     },
     {
       "test": "test_partial_profile_update_preserves_existing_fields",
-      "description": "Defect check: editing first_name must preserve email, last_name, and phone.",
+      "description": "Profile editing changes only supplied fields on the authenticated user's own profile.",
       "status": "PASS",
       "observations": [
-        "After first_name-only update: {'email': 'alice@cic-mock.example', 'first_name': 'Updated', 'last_name': 'Volunteer', 'phone': ''}"
+        "alice PATCH /api/profile: HTTP 200",
+        "alice PATCH /api/profile: HTTP 200"
       ]
     },
     {
@@ -164,31 +208,95 @@
       ]
     },
     {
-      "test": "test_profile_insert_failure_leaves_a_partial_auth_account",
-      "description": "Registration risk: failed profile insert leaves an Auth account without a profile.",
+      "test": "test_profile_api_rejects_identity_and_auth_field_changes",
+      "description": "Profile edits reject account IDs, roles, login email, and empty names.",
       "status": "PASS",
       "observations": [
-        "Simulated profile write failure: Auth record remains; no rollback is implemented. This does not prove actual RLS behavior."
+        "alice PATCH /api/profile: HTTP 400",
+        "alice PATCH /api/profile: HTTP 400",
+        "alice PATCH /api/profile: HTTP 400",
+        "alice PATCH /api/profile: HTTP 400"
+      ]
+    },
+    {
+      "test": "test_profile_trigger_failure_rolls_back_auth_account",
+      "description": "Failed profile creation rolls back signup; retry creates one Auth/profile pair.",
+      "status": "PASS",
+      "observations": [
+        "Mock profile trigger failure rolled back signup entirely; retry created exactly one Auth/profile pair."
       ]
     },
     {
       "test": "test_public_registration_cannot_create_admin",
-      "description": "No Admin signup exists; Account.create_account always assigns volunteer.",
+      "description": "Caller-supplied Admin roles on either alias create volunteers without Admin access.",
       "status": "PASS",
       "observations": [
+        "public POST /api/register: HTTP 201",
+        "public POST /api/login: HTTP 200",
+        "public POST /api/announcements: HTTP 403",
+        "public POST /api/signup: HTTP 201",
+        "public POST /api/login: HTTP 200",
+        "public POST /api/announcements: HTTP 403",
         "public POST /api/admin/register: HTTP 404",
-        "Admin used by functional tests is a seeded account, not a successful public Admin registration."
+        "Both aliases ignored caller-supplied Admin roles; newly registered volunteers were denied Admin actions."
       ]
     },
     {
-      "test": "test_public_registration_is_blocked_for_both_roles",
-      "description": "Registration status: both roles and both aliases return 503; no rows are created.",
+      "test": "test_public_registration_creates_profile_and_requires_email_confirmation",
+      "description": "Both aliases create Auth/profile rows; confirmation enables login and identity lookup.",
       "status": "PASS",
       "observations": [
-        "public POST /api/register: HTTP 503",
-        "public POST /api/signup: HTTP 503",
-        "public POST /api/register: HTTP 503",
-        "public POST /api/signup: HTTP 503"
+        "public POST /api/register: HTTP 201",
+        "public POST /api/login: HTTP 401",
+        "public POST /api/login: HTTP 200",
+        "public GET /api/me: HTTP 200",
+        "public POST /api/signup: HTTP 201",
+        "public POST /api/login: HTTP 401",
+        "public POST /api/login: HTTP 200",
+        "public GET /api/me: HTTP 200",
+        "Both aliases created matching Auth/volunteer profile rows; login required simulated email confirmation."
+      ]
+    },
+    {
+      "test": "test_public_registration_trigger_failure_is_atomic",
+      "description": "Both aliases report trigger failures without leaving orphaned Auth/profile rows.",
+      "status": "PASS",
+      "observations": [
+        "public POST /api/register: HTTP 500",
+        "public POST /api/signup: HTTP 500"
+      ]
+    },
+    {
+      "test": "test_task_api_rejects_invalid_payloads_and_ids",
+      "description": "Only valid title and description updates reach the task manager.",
+      "status": "PASS",
+      "observations": [
+        "admin POST /api/tasks: HTTP 400",
+        "admin POST /api/tasks: HTTP 400",
+        "admin POST /api/tasks: HTTP 400",
+        "admin PATCH /api/tasks/20000000-0000-4000-8000-000000000001: HTTP 400",
+        "admin PATCH /api/tasks/20000000-0000-4000-8000-000000000001: HTTP 400",
+        "admin PATCH /api/tasks/20000000-0000-4000-8000-000000000001: HTTP 400",
+        "admin GET /api/tasks/not-a-uuid: HTTP 400"
+      ]
+    },
+    {
+      "test": "test_task_detail_visibility_and_admin_mutation_permissions",
+      "description": "Task details follow list visibility; Volunteer task management requests cannot change rows.",
+      "status": "PASS",
+      "observations": [
+        "alice GET /api/tasks/20000000-0000-4000-8000-000000000001: HTTP 200",
+        "alice GET /api/tasks/20000000-0000-4000-8000-000000000003: HTTP 404",
+        "alice GET /api/tasks/20000000-0000-4000-8000-000000000004: HTTP 404",
+        "alice GET /api/tasks/20000000-0000-4000-8000-000000000005: HTTP 404",
+        "admin GET /api/tasks/20000000-0000-4000-8000-000000000001: HTTP 200",
+        "admin GET /api/tasks/20000000-0000-4000-8000-000000000003: HTTP 200",
+        "admin GET /api/tasks/20000000-0000-4000-8000-000000000004: HTTP 200",
+        "admin GET /api/tasks/20000000-0000-4000-8000-000000000005: HTTP 404",
+        "alice POST /api/tasks: HTTP 403",
+        "alice PUT /api/tasks/20000000-0000-4000-8000-000000000001: HTTP 403",
+        "alice PATCH /api/tasks/20000000-0000-4000-8000-000000000001: HTTP 403",
+        "alice DELETE /api/tasks/20000000-0000-4000-8000-000000000001: HTTP 403"
       ]
     },
     {
@@ -240,7 +348,7 @@
         "alice POST /api/tasks/20000000-0000-4000-8000-000000000001/submit: HTTP 409",
         "alice POST /api/tasks/20000000-0000-4000-8000-000000000001/photo: HTTP 200",
         "alice POST /api/tasks/20000000-0000-4000-8000-000000000001/submit: HTTP 200",
-        "admin POST /api/assignments/528998e6-c711-424e-88f7-6e9734b7c1e0/verify: HTTP 200",
+        "admin POST /api/assignments/57e9dd28-69aa-4dd3-80c5-badf77fd8e65/verify: HTTP 200",
         "Storage received PNG bytes with the volunteer's bearer token; completed hours changed from 1.5 to 4.0."
       ]
     }

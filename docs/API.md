@@ -55,7 +55,7 @@ remain at the top level:
 {"ok": false, "error": "Unauthorized"}
 ```
 
-List responses use `tasks`, `announcements`, or `assignments` arrays, including
+List responses use `tasks`, `announcements`, `assignments`, or `history` arrays, including
 when the list is empty. In particular, `/api/announcements` now returns an object
 containing `announcements` rather than a bare array. Task operation responses
 retain the existing `assignment` field, whose value is an array of changed rows.
@@ -67,13 +67,18 @@ API responses use `Cache-Control: no-store`.
 | --- | --- | --- | --- |
 | GET | `/api/health` | Public | `message`; confirms the Flask app is running, without a database check |
 | POST | `/api/login` | Public | JSON `email`, `password` → `role`, `access_token`, `message` |
-| POST | `/api/register` | Public | JSON `email`, `password`, `first_name`, `last_name`, optional string `phone`; currently 503 |
-| POST | `/api/signup` | Public | Alias of `/api/register`; currently 503 |
+| POST | `/api/register` | Public | JSON `email`, `password`, `first_name`, `last_name`, optional string `phone` → `message`; 201 when Supabase accepts a volunteer registration |
+| POST | `/api/signup` | Public | Alias of `/api/register` |
 | GET | `/api/me` | Optional token | `logged_in`, and when authenticated, `user_id`, `role` |
+| PATCH | `/api/profile` | Admin or volunteer, own profile only | JSON with one or more of `first_name`, `last_name`, `phone` → `profile` |
 | GET | `/api/pages/<page_name>` | Bearer token; admin pages require admin | Authorized completed template in `html`, or a dashboard `redirect` |
 | POST | `/api/logout` | Public | `message`; client clears its token |
 | POST | `/api/reset-password` | Public | JSON `email` → generic `message` |
 | GET | `/api/tasks` | Signed in | `tasks` |
+| POST | `/api/tasks` | Admin | JSON `title` and optional `description` → `task`; 201 |
+| GET | `/api/tasks/<task_id>` | Admin or volunteer | `task`; volunteers can see only open tasks; neither role sees deleted tasks |
+| PUT, PATCH | `/api/tasks/<task_id>` | Admin | JSON `title` and/or `description` → updated `task` |
+| DELETE | `/api/tasks/<task_id>` | Admin | Soft deletes a task → `message` |
 | GET | `/api/announcements` | Signed in | `announcements` |
 | POST | `/api/announcements` | Admin | JSON `title`, `content` → `message`; 201 |
 | PUT | `/api/announcements/<announcement_id>` | Admin | JSON `title` and/or `content` → `message` |
@@ -84,23 +89,28 @@ API responses use `Cache-Control: no-store`.
 | POST | `/api/tasks/<task_id>/submit` | Volunteer | `message`, `assignment` |
 | GET | `/api/assignments/status` | Signed in | `assignments`; volunteer sees own, admin sees all |
 | POST | `/api/assignments/<assignment_id>/verify` | Admin | JSON boolean `approved` → `message`, `assignment` |
+| GET | `/api/history` | Admin or volunteer | `history`: completed and cancelled assignments. Admin can filter by `?volunteer_id=<uuid>`; volunteers see their own records |
+| GET | `/api/hours` | Admin or volunteer | `volunteer_id` and `total_hours` for completed work. Admin must supply `?volunteer_id=<uuid>`; volunteers see their own total |
 
 Path IDs must be UUIDs. Uploads accept `.jpg`, `.jpeg`, `.png`, and `.webp` files;
 the total request size, including multipart overhead, is limited to 10 MiB.
 The assignment must have a photo before submission, and an admin reviews the
 submitted assignment. Business rules and database policies remain in their
-existing modules.
+existing modules. Task titles and profile names cannot be blank. An empty
+description or phone string clears that field; omitted fields are preserved when
+editing. Profile edits do not change login email or role. Hours are summed from
+the current task estimates; cancelled work does not count toward hours.
 
 Common errors: 400 for invalid input, 401 for absent/invalid authentication,
 403 for insufficient role, 404 for missing resources, 405 for an unsupported
 method, 409 for rejected assignment transitions, 413 for oversized requests,
-500 for a backend failure, and 503 for paused registration. Task picking can
+and 500 for a backend failure. Task picking can
 also return 400 when the task cannot be picked.
 
-Registration stays paused on both paths until Auth/Profile synchronization and
-admin enrollment requirements are settled. Password reset responses deliberately
-do not reveal whether an email address exists. Supabase's reset redirect and
-password-update page still need configuration for a complete recovery flow.
+Public registration is for volunteers and relies on the Supabase profile creation
+trigger. Password reset responses deliberately do not reveal whether an email
+address exists. Supabase's reset redirect and password-update page still need
+configuration for a complete recovery flow.
 
 ## Browser client
 
@@ -137,6 +147,5 @@ await CICApi.logout();
 multipart Content-Type handling to the browser. Requests must use a same-origin
 `/api/` path. The client emits `cic:session-expired` when a token receives 401.
 
-Task CRUD, profile editing, service history, volunteer hours, and full dashboard
-pages are not introduced by this integration; the table above lists the routes
-that are currently exposed.
+The task management and profile editing routes provide JSON for future browser
+forms. They do not create a Tasks or Account Settings page.
