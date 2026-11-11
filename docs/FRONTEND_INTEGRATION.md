@@ -75,9 +75,10 @@ of pretending that a user's history is empty.
 
 ## Remaining gaps and ownership
 
-- Account Settings has no template. Tasks, Services, and FAQ templates are empty.
-  Their existing links remain 404s. No unfinished workflow or placeholder feature
-  was added; existing task and assignment APIs remain available.
+- Account Settings has no template, the Tasks template is not routed, and the
+  Services and FAQ templates are empty. Their links still return 404.
+  Task management, profile edits, history, and hours are available through the
+  JSON endpoints in [the API contract](API.md).
 - There is no separate admin dashboard design; Admin History is the landing page.
 - Token expiry, refresh, logout revocation, and session-storage policy are unchanged
   and remain the cybersecurity teammate's responsibility.
