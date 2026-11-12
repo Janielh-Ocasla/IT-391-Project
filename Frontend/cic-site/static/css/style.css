@@ -467,7 +467,7 @@ section:not(#wip) div.overview-paragraph {
     display: flex;
     flex-direction: column;
     width: 30vw;
-    height: 60vh;
+    height: 70vh;
     border: 3px solid var(--main-color);
     border-radius: 12px;
     padding: 30px;
@@ -477,4 +477,23 @@ section:not(#wip) div.overview-paragraph {
 .example-card img {
     height: 34vh;
     width: 100%;
+}
+
+.example-card h3 {
+    color: var(--main-color);
+}
+
+.example-card a {
+    color: white;
+    padding: 10px;
+    border-radius: 30px;
+    background-color: var(--accent-color);
+    border: 3px solid var(--secondary-color);
+    text-decoration: none;
+}
+
+.example-card a:hover {
+    border: 3px solid var(--accent-color);
+    background-color: var(--secondary-color);
+    cursor: pointer;
 }
