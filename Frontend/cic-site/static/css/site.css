@@ -232,3 +232,72 @@ img { max-width: 100%; }
   .modal-side { display: none; }
   .modal { border-radius: 24px; max-width: 420px; }
 }
+
+/* ===== Account menu (shared across member pages) ===== */
+[hidden] { display: none !important; }
+
+.account-menu { position: relative; margin-left: auto; }
+
+.account-trigger {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 14px; font: inherit; font-weight: 600; font-size: 0.9rem;
+  color: var(--accent); background: var(--accent-soft); border: 1px solid #d6e5f7;
+  border-radius: 24px; cursor: pointer; transition: background 0.2s;
+}
+.account-trigger:hover { background: #d6e5f7; }
+.account-avatar {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--accent); color: #fff; font-size: 0.85rem; font-weight: 700;
+}
+.account-avatar.lg { width: 40px; height: 40px; font-size: 1rem; }
+.account-caret { font-size: 0.7rem; transition: transform 0.2s; }
+.account-menu.open .account-caret { transform: rotate(180deg); }
+
+.account-dropdown {
+  position: absolute; top: calc(100% + 10px); right: 0;
+  width: 264px; padding: 8px;
+  background: #fff; border: 1px solid var(--border); border-radius: 14px;
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.14);
+  display: none; z-index: 200;
+}
+.account-menu.open .account-dropdown { display: block; }
+
+.account-dropdown-head {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 10px 12px; border-bottom: 1px solid #eef1f5; margin-bottom: 6px;
+}
+.account-name { margin: 0; font-weight: 600; color: var(--text); font-size: 0.95rem; }
+.account-role { margin: 2px 0 0; color: var(--muted); font-size: 0.8rem; }
+
+.account-item {
+  display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
+  padding: 10px 12px; font: inherit; font-size: 0.9rem;
+  color: var(--text); background: none; border: none; border-radius: 10px;
+  text-decoration: none; cursor: pointer;
+}
+.account-item:hover { background: #f2f6fc; color: var(--accent); }
+.account-item .ico { width: 18px; text-align: center; }
+.account-item.danger { color: #b42318; }
+.account-item.danger:hover { background: #fdecea; color: #b42318; }
+
+.account-divider { height: 1px; background: #eef1f5; margin: 6px 4px; }
+
+.account-reset { padding: 4px 8px 10px; }
+.account-reset form { display: flex; flex-direction: column; gap: 8px; }
+.account-reset input {
+  width: 100%; padding: 9px 12px; font: inherit;
+  border: 1px solid var(--border); border-radius: 10px; outline: none;
+}
+.account-reset input:focus { border-color: var(--focus); box-shadow: 0 0 0 2px rgba(0,116,232,0.25); }
+.account-reset button {
+  font: inherit; font-weight: 600; color: #fff; background: var(--accent);
+  border: none; border-radius: 10px; padding: 9px; cursor: pointer;
+}
+.account-reset button:hover { background: var(--accent-dark); }
+.account-reset button:disabled { opacity: 0.6; cursor: default; }
+.account-msg { margin: 8px 0 0; font-size: 0.8rem; color: var(--muted); }
+.account-msg.error { color: #c00; }
+.account-msg.ok { color: #1a7f37; }
+
+@media (max-width: 550px) { .account-dropdown { width: 232px; } }
