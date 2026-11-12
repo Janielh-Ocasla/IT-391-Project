@@ -1,26 +1,32 @@
 /* =====================================================
    Member donate page styles
-   (header, buttons and the login popup are in style.css / site.css)
+   (header, buttons and the login popup are in member.css / site.css)
    ===================================================== */
 
-/* ---------- Member dashboard strip ---------- */
-.member-strip {
+/* ---------- Dashboard strip (same as history.css) ---------- */
+.dashboard-strip {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: space-evenly;   
-  gap: 8px 24px;
-  padding: 14px 24px;
-  background: var(--panel);
-  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;            
+  gap: 8px;
+  padding: 10px 5%;
+  background-color: #f5f7fa;
+  border-bottom: 1px solid #e5e5e5;
+  overflow-x: auto;
 }
-.member-strip a {
-  padding: 4px 0;
-  font-weight: 600;
+.dashboard-strip a {
+  white-space: nowrap;
   text-decoration: none;
-  border-bottom: 2px solid transparent;
+  color: #1a1a1a;
+  font-weight: 500;
+  font-size: 0.92rem;
+  padding: 8px 16px;
+  border-radius: 20px;
+  transition: 0.2s;
 }
-.member-strip a:hover { color: var(--accent); }
-.member-strip a.current { color: var(--accent); border-bottom-color: var(--accent); }
+.dashboard-strip a:hover { background-color: #e8f0fa; color: #1f5fae; }
+.dashboard-strip a.active { background-color: #1f5fae; color: #ffffff; }
+@media (max-width: 550px) { .dashboard-strip { padding: 8px 16px; } }
+.member-header { flex-shrink: 0; }
 
 /* ---------- Page layout ---------- */
 .give-wrap {
@@ -104,9 +110,9 @@
   .give-wrap { padding: 24px 16px 48px; }
 }
 
-/* "See Drop-off Details" button scrolls smoothly and stops below the fixed header */
+/* "See Drop-off Details" button scrolls smoothly */
 html { scroll-behavior: smooth; }
-.info-box { scroll-margin-top: 140px; }
+.info-box { scroll-margin-top: 24px; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
 }
