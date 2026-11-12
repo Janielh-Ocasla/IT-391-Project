@@ -1,5 +1,9 @@
 :root {
     --main-color: #00155c;
+    --secondary-color: rgb(92, 125, 235);
+    --accent-color: rgb(0, 132, 255);
+    --section-color-1: rgb(131, 195, 255);
+    --background-color-1: rgb(176, 217, 255);
 }
 
 * {
@@ -117,8 +121,8 @@ main {
 }
 
 section {
-    padding-top: 60px;
-    padding-bottom: 60px;
+    padding-top: 20px;
+    padding-bottom: 20px;
 }
 
 /*-----Overview Section-----*/
@@ -159,23 +163,6 @@ section:not(#wip) div.overview-paragraph {
     max-width: 70%;
     object-fit: contain;
     border-radius: 10px;
-}
-
-/*-----Styles for Work In Progress pages*/
-section#wip{
-    height: 80vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    gap: 10px;
-}
-
-section#wip img{
-    background-color: rgb(189, 189, 189);
-    width: 50vh;
-    height: auto;
 }
 
 /*-----Call to Action Section-----*/
@@ -339,7 +326,7 @@ section#wip img{
 
 /*------Donate Page-----*/
 #donate {
-    height: 135vh;
+    height: 210vh;
     display: flex;
     flex-direction: column;
     text-align: center;
@@ -394,4 +381,100 @@ section#wip img{
 #monetary-donations img {
     width: 50px;
     height: auto;
+}
+
+/*-----Volunteer Page-----*/
+#volunteer-header {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: var(--main-color);
+}
+
+#volunteer-header h1 {
+    font-size: 5rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+#volunteer-header h2 {
+    color: var(--secondary-color);
+}
+
+#outer-section {
+    background-color: var(--section-color-1);
+    width: 100vw;
+    margin-top: 10px;
+    text-align: center;
+}
+
+#create-account {
+    height: 25vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 300px;
+    gap: 15px;
+    border: 2pt solid var(--main-color);
+    background-color: white;
+    border-radius: 12px;
+}
+
+#create-account h1 {
+    font-size: 2rem;
+    color: var(--main-color);
+}
+
+#create-account button {
+    color: white;
+    padding: 10px;
+    border-radius: 30px;
+    background-color: var(--accent-color);
+    border: 3px solid var(--secondary-color);
+}
+
+#create-account p {
+    font-size: 1.25rem;
+    color: var(--accent-color);
+}
+
+#create-account button:hover {
+    border: 3px solid var(--accent-color);
+    background-color: var(--secondary-color);
+    cursor: pointer;
+}
+
+#volunteer-opportunities {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    margin-bottom: 30px;
+    gap: 25px;
+}
+
+#tasks {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 25px;
+}
+
+.example-card {
+    background-color: var(--background-color-1);
+    display: flex;
+    flex-direction: column;
+    width: 30vw;
+    height: 60vh;
+    border: 3px solid var(--main-color);
+    border-radius: 12px;
+    padding: 30px;
+    gap: 20px;
+}
+
+.example-card img {
+    height: 34vh;
+    width: 100%;
 }

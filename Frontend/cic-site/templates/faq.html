@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}">
+</head>
+<body>
+    <!--Header-->
+    <nav class="header">
+        <div class="logo-container">
+            <a href="home.html">
+                <img src="{{ url_for('static', filename='images/Logo.png') }}" alt="Community Innovation Center Logo" class="logo">
+            </a>
+        </div>
+    
+
+        <!--Login/Signup-->
+        <button class="btn btn-primary" id="openLogin">Login / Signup</button>
+
+    </nav>
+
+    <main>
+        
+        <section id="wip">
+            <!-- image: Hammer icon; flaticon.com -->
+            <img src="{{ url_for('static', filename='images/wip.png') }}" alt="WIP Icon" class="hammer-wrench-icon">
+            <h1>Sorry, this page is still being worked on</h1>
+            <a href="home.html">Return Home</a>
+        </section>
+    </main>
+
+    <!-- ===== Footer ===== -->
+    <footer class="site-footer">
+        <div class="container">
+        <div class="footer-grid">
+            <img alt="Community Innovation Center"
+                src="https://static.wixstatic.com/media/c5f985_712eb51acfae41ef9dacca664413c454~mv2.png/v1/fill/w_980,h_509,al_c,q_90/transparent%20logo_edited.png" />
+            <ul class="footer-links">
+            <li><a href="mailto:innovationcenter1050@gmail.com">innovationcenter1050@gmail.com</a></li>
+            <li><a href="https://www.facebook.com/profile.php?id=61564768987902" rel="noopener">Facebook</a></li>
+            <li><a href="https://www.instagram.com/communityinnovationcenter/" rel="noopener">Instagram</a></li>
+            <li><a href="#">Terms &amp; Conditions</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+            </ul>
+        </div>
+        <p class="footer-copy">Chicago, Illinois</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/api.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/site.js') }}" defer></script>
+</body>
+</html>
