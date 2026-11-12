@@ -4,34 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Announcements | Community Innovation Center</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/member.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/announcement.css') }}">
 </head>
 <body>
 
-    <!-- Header: logo + the login/logout button that site.js controls -->
-    <nav class="header">
-        <div class="logo-container">
-            <a href="member.html">
-                <img src="{{ url_for('static', filename='images/Logo.png') }}" alt="Community Innovation Center Logo" class="logo">
+    <header class="member-header">
+            <a href="/member" class="member-logo">
+                <img src="{{ url_for('static', filename='images/Logo.png') }}" alt="CIC Logo">
             </a>
+
+        <div class="account-menu" data-account-menu hidden>
+            <button type="button" class="account-trigger" aria-haspopup="true" aria-expanded="false">
+                <span class="account-avatar" aria-hidden="true">👤</span>
+                <span class="account-label">Account</span>
+                <span class="account-caret" aria-hidden="true">▾</span>
+            </button>
+            <div class="account-dropdown" role="menu">
+                <div class="account-dropdown-head">
+                    <span class="account-avatar lg" aria-hidden="true">👤</span>
+                    <div>
+                        <p class="account-name">Your account</p>
+                        <p class="account-role" data-account-role>Signed in</p>
+                    </div>
+                </div>
+                <a href="/account" class="account-item" role="menuitem"><span class="ico">⚙️</span> Account settings</a>
+                <button type="button" class="account-item" role="menuitem" data-account-reset><span class="ico">🔑</span> Reset password</button>
+                <div class="account-reset" hidden>
+                    <form id="account-reset-form">
+                        <input type="email" placeholder="Your email address" aria-label="Email for reset link" required>
+                        <button type="submit">Send reset link</button>
+                    </form>
+                    <p id="account-reset-msg" class="account-msg" role="status"></p>
+                </div>
+                <a href="/account#profile" class="account-item" role="menuitem"><span class="ico">👤</span> Edit profile</a>
+                <a href="/account#notifications" class="account-item" role="menuitem"><span class="ico">🔔</span> Notification preferences</a>
+                <a href="/faq" class="account-item" role="menuitem"><span class="ico">❓</span> Help &amp; FAQ</a>
+                <div class="account-divider"></div>
+                <a href="/" class="account-item danger" role="menuitem" data-signout><span class="ico">↩</span> Sign out</a>
+            </div>
         </div>
-        <button id="login-button">Login / Sign Up</button>
+    </header>
+
+    <nav class="dashboard-strip" aria-label="Member dashboard">
+        <a href="/member">Home</a>
+        <a href="/announcements" class="active" aria-current="page">Announcements</a>
+        <a href="/tasks">Tasks</a>
+        <a href="/history">History</a>
+        <a href="/member_donate">Donate</a>
+        <a href="/services">Services</a>
+        <a href="/faq">FAQ / Help</a>
     </nav>
 
-    <main>
-        <!-- Member dashboard strip -->
-        <nav class="member-strip" aria-label="Member dashboard">
-            <a href="member.html">Home</a>
-            <a href="announcement.html" class="current" aria-current="page">Announcements</a>
-            <a href="task.html">Tasks</a>
-            <a href="history.html">History</a>
-            <a href="member_donate.html">Donate</a>
-            <a href="services.html">Service Requests</a>
-            <a href="faq.html">FAQ</a>
-        </nav>
-
+    <main>    
         <div class="ann-wrap">
             <header class="ann-header">
                 <p class="ann-eyebrow">Member announcements</p>
@@ -159,6 +185,7 @@
 
     <script src="{{ url_for('static', filename='js/api.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/site.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/account_menu.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/announcement.js') }}" defer></script>
 </body>
 </html>
