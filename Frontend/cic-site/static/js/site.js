@@ -208,7 +208,7 @@
     if (!res.ok) return setMsg('loginMsg', res.error || 'Login failed.', 'error');
 
     const dashboard = res.role === 'volunteer' ? '/member'
-      : res.role === 'admin' ? '/admin/history' : null;
+      : res.role === 'admin' ? '/admin' : null;
     if (!dashboard) return setMsg('loginMsg', 'Your account does not have access to a dashboard.', 'error');
     loggedIn = true;
     form.reset();

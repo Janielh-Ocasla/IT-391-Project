@@ -15,7 +15,7 @@
       : result.error || 'Could not load this page. Please try again.';
     return;
   }
-  if (result.redirect === '/admin/history') {
+  if (result.redirect === '/admin' || result.redirect === '/admin/history') {
     window.location.replace(result.redirect);
     return;
   }
