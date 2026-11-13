@@ -36,11 +36,20 @@ app = Flask(
 app.config["MAX_CONTENT_LENGTH"] = 10 * 1024 * 1024
 MEMBER_TEMPLATES = {
     "member": "member.html",
+    "tasks": "task.html",
     "history": "history.html",
     "history-admin": "history-admin.html",
     "announcement": "announcement.html",
     "member_donate": "member_donate.html",
+    "account": "unavailable.html",
+    "services": "unavailable.html",
+    "faq": "unavailable.html",
     "admin": None,
+}
+UNAVAILABLE_PAGES = {
+    "account": ("Account Settings", "Account settings are not available on the website yet."),
+    "services": ("Services", "Online service requests are not available yet."),
+    "faq": ("FAQ / Help", "The FAQ is not available yet."),
 }
 
 
@@ -250,6 +259,23 @@ def member_dashboard():
     return render_template("member-loader.html", page_name="member")
 
 
+@app.route("/tasks", methods=["GET"])
+@app.route("/task.html", methods=["GET"])
+def tasks_page():
+    return render_template("member-loader.html", page_name="tasks")
+
+
+@app.route("/account")
+@app.route("/account.html")
+@app.route("/services")
+@app.route("/services.html")
+@app.route("/faq")
+@app.route("/faq.html")
+def unavailable_member_page():
+    page_name = request.path.removeprefix("/").removesuffix(".html")
+    return render_template("member-loader.html", page_name=page_name)
+
+
 @app.route("/admin", methods=["GET"])
 def admin_dashboard():
     return render_template("member-loader.html", page_name="admin")
@@ -326,7 +352,13 @@ def get_member_page(page_name):
             return jsonify({"redirect": "/admin/history"}), 200
 
         context = {}
-        if page_name == "history":
+        if page_name in UNAVAILABLE_PAGES:
+            heading, message = UNAVAILABLE_PAGES[page_name]
+            context = {"heading": heading, "message": message,
+                       "dashboard_endpoint": "admin_history" if role == "admin" else "member_dashboard"}
+        elif page_name == "tasks":
+            context = {"can_pick_tasks": role == "volunteer"}
+        elif page_name == "history":
             rows = completed_history_rows(manager, user_id)
             context = {"member_tasks": rows, "total_hours": round(sum(row["hours"] for row in rows), 2)}
         elif page_name == "history-admin":

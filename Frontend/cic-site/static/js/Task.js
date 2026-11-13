@@ -7,13 +7,13 @@
   const eventsList = document.getElementById('events-list');
   const eventsEmpty = document.getElementById('events-empty');
   const searchEl = document.getElementById('task-search');
+  const canPick = taskList.dataset.canPick === 'true';
 
   let allTasks = [];
 
   function esc(value) {
-    const div = document.createElement('div');
-    div.textContent = value == null ? '' : String(value);
-    return div.innerHTML;
+    const entities = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+    return String(value ?? '').replace(/[&<>"']/g, char => entities[char]);
   }
 
   function setStatus(message, isError) {
@@ -27,11 +27,11 @@
     const location = esc(task.location || task.address || 'Location TBD');
     const desc = esc(task.description || task.details || '');
     return `
-      <article class="task-card" data-search="${title} ${location}">
+      <article class="task-card">
         <h3>${title}</h3>
         <p class="task-meta">📍 ${location}</p>
         ${desc ? `<p class="task-desc">${desc}</p>` : ''}
-        <button class="btn-pick" data-task-id="${id}">Pick up task</button>
+        ${canPick ? `<button class="btn-pick" data-task-id="${id}">Pick up task</button>` : ''}
       </article>`;
   }
 
@@ -59,7 +59,7 @@
 
   async function pickTask(taskId, button) {
     button.disabled = true;
-    const result = await api.request(`/api/tasks/${taskId}/pick`, { method: 'POST', body: {} });
+    const result = await api.request(`/api/tasks/${encodeURIComponent(taskId)}/pick`, { method: 'POST', body: {} });
     if (result.ok) {
       button.textContent = 'Picked ✓';
     } else {
@@ -94,8 +94,12 @@
   searchEl.addEventListener('input', renderTasks);
   taskList.addEventListener('click', function (e) {
     const btn = e.target.closest('.btn-pick');
-    if (btn && btn.dataset.taskId) pickTask(btn.dataset.taskId, btn);
+    if (canPick && btn && btn.dataset.taskId) pickTask(btn.dataset.taskId, btn);
   });
 
-  document.addEventListener('DOMContentLoaded', load);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', load);
+  } else {
+    load();
+  }
 })();

@@ -147,5 +147,6 @@ await CICApi.logout();
 multipart Content-Type handling to the browser. Requests must use a same-origin
 `/api/` path. The client emits `cic:session-expired` when a token receives 401.
 
-The task management and profile editing routes provide JSON for future browser
-forms. They do not create a Tasks or Account Settings page.
+The Tasks page lists tasks for both roles and supports pickup for volunteers.
+Admin task management and profile editing are exposed as JSON endpoints; the
+browser forms for those operations are not available yet.
