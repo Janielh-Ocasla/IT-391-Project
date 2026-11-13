@@ -152,6 +152,14 @@
     if (openBtn) openBtn.textContent = loggedIn ? 'Log out' : 'Login/Signup';
   }
 
+  // Connect the completed templates' Sign Out links to the existing API client.
+  document.querySelectorAll('[data-signout]').forEach(link =>
+    link.addEventListener('click', async (event) => {
+      event.preventDefault();
+      await api.logout();
+      window.location.replace('/');
+    }));
+
   if (openBtn) {
     openBtn.addEventListener('click', async () => {
       if (loggedIn) {
@@ -199,13 +207,14 @@
 
     if (!res.ok) return setMsg('loginMsg', res.error || 'Login failed.', 'error');
 
+    const dashboard = res.role === 'volunteer' ? '/member'
+      : res.role === 'admin' ? '/admin/history' : null;
+    if (!dashboard) return setMsg('loginMsg', 'Your account does not have access to a dashboard.', 'error');
     loggedIn = true;
     form.reset();
     updateHeaderButton();
     closeModal();
-    // TODO: send people to the right dashboard based on res.role
-    // (e.g. 'volunteer' vs. an admin role)
-    console.log('Logged in with role:', res.role);
+    window.location.assign(dashboard);
   });
 
   /* ---------- Create account ---------- */
@@ -264,6 +273,8 @@
     loggedIn = false;
     updateHeaderButton();
   });
+
+  if (new URLSearchParams(window.location.search).get('login') === '1') openModal();
 
   (async () => {
     const res = await api.request('/api/me');

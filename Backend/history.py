@@ -96,8 +96,8 @@ class History:
             # service history includes both completed and cancelled tasks
             query = (
                 self.supabase.table("assignments")
-                .select("id, task_id, status, assigned_at, cancelled_at, submitted_at, reviewed_at, "
-                        "tasks(title, description, deleted_at)")
+                .select("id, task_id, volunteer_id, status, assigned_at, cancelled_at, submitted_at, reviewed_at, "
+                        "tasks(title, description, deleted_at, estimated_hours)")
                 .in_("status", ["completed", "cancelled"])
             )
             if self.is_admin(user_id):
