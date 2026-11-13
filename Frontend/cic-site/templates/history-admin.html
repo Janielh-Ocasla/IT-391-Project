@@ -139,8 +139,8 @@
 <!-- ===== CIC site footer — sticks to bottom on short pages ===== -->
 <style>
   /* Pin footer to the bottom even when page content is short */
-  html, body { height: 100%; }
   body { display: flex; flex-direction: column; min-height: 100vh; margin: 0; }
+  body > header, body > nav { flex-shrink: 0; }
   body > main, body > .page, body > section:not(.site-footer) { flex: 1 0 auto; }
 
   .site-footer { flex-shrink: 0; background: #14233a; color: #cfd8e6; padding: 40px 0 24px; }
@@ -198,12 +198,12 @@
       <div class="footer-col">
         <h3>Quick Links</h3>
         <ul>
-          <li><a href="member.html">Home</a></li>
-          <li><a href="announcement.html">Announcements</a></li>
-          <li><a href="task.html">Tasks</a></li>
-          <li><a href="history.html">History</a></li>
-          <li><a href="member_donate.html">Donate</a></li>
-          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="/admin">Home</a></li>
+          <li><a href="/announcements">Announcements</a></li>
+          <li><a href="/tasks">Tasks</a></li>
+          <li><a href="/admin/history">History</a></li>
+          <li><a href="/member_donate">Donate</a></li>
+          <li><a href="/faq">FAQ</a></li>
         </ul>
       </div>
 
