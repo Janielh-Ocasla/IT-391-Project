@@ -474,6 +474,8 @@ section {
     background-color: var(--background-color-1);
     display: flex;
     flex-direction: column;
+    width: 30vw;
+    height: 70vh;
     border: 3px solid var(--main-color);
     border-radius: 12px;
     padding: clamp(14px, 2.5vw, 30px);
@@ -516,4 +518,24 @@ section {
 
 @media (max-width: 550px) {
     #call-to-action .cards, #tasks { grid-template-columns: minmax(0, 1fr); }
+}
+}
+
+.example-card h3 {
+    color: var(--main-color);
+}
+
+.example-card a {
+    color: white;
+    padding: 10px;
+    border-radius: 30px;
+    background-color: var(--accent-color);
+    border: 3px solid var(--secondary-color);
+    text-decoration: none;
+}
+
+.example-card a:hover {
+    border: 3px solid var(--accent-color);
+    background-color: var(--secondary-color);
+    cursor: pointer;
 }
