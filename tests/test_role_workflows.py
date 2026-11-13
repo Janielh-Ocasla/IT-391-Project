@@ -369,49 +369,112 @@ class RoleWorkflowTests(unittest.TestCase):
             self.assertEqual(self.call("POST", f"/api/tasks/{self.task_ids[0]}/{action}", "admin").status_code, 403)
         self.assertEqual(self.db.tables, before)
 
-    def test_admin_task_crud_module_and_missing_api_routes(self):
-        """Module CRUD works and enforces roles; task creation/detail/edit/delete APIs are missing."""
-        manager = task.Task()
-        admin_id, volunteer_id = self.actors["admin"]["id"], self.actors["alice"]["id"]
-        self.assertFalse(manager.create_task(volunteer_id, "Not allowed"))
-        self.assertTrue(manager.create_task(admin_id, " [MOCK CIC] Created task ", " Details "))
-        row = next(row for row in self.db.tables["tasks"] if row["title"] == "[MOCK CIC] Created task")
-        self.assertEqual(manager.task_info(row["id"])["description"], "Details")
-        self.assertFalse(manager.edit_task(volunteer_id, row["id"], "bad"))
-        self.assertTrue(manager.edit_task(admin_id, row["id"], "[MOCK CIC] Edited task"))
-        self.assertFalse(manager.delete_task(volunteer_id, row["id"]))
-        self.assertTrue(manager.delete_task(admin_id, row["id"]))
-        self.assertIsNone(manager.task_info(row["id"]))
-        self.assertIsNotNone(self.db.row("tasks", row["id"])["deleted_at"])
-        self.assertEqual(self.call("POST", "/api/tasks", "admin", json={"title": "[MOCK CIC] API"}).status_code, 405)
-        for method in ("GET", "PUT", "DELETE"):
-            self.assertEqual(self.call(method, f"/api/tasks/{row['id']}", "admin", json={}).status_code, 404)
+    def test_admin_task_lifecycle_through_api(self):
+        """Admin can publish, view, edit, and soft-delete a task through the API."""
+        created = self.call("POST", "/api/tasks", "admin", json={"title": " New task ", "description": " Details "})
+        self.assertEqual(created.status_code, 201)
+        row = created.json["task"]
+        self.assertEqual((row["title"], row["description"], row["status"]), ("New task", "Details", "open"))
+        self.assertEqual(row["created_by"], self.actors["admin"]["id"])
+        path = f"/api/tasks/{row['id']}"
+        self.assertEqual(self.call("GET", path, "alice").json["task"]["id"], row["id"])
+        edited = self.call("PUT", path, "admin", json={"title": " Edited task "})
+        self.assertEqual(edited.status_code, 200)
+        self.assertEqual(edited.json["task"]["title"], "Edited task")
+        self.assertEqual(edited.json["task"]["description"], "Details")
+        cleared = self.call("PATCH", path, "admin", json={"description": ""})
+        self.assertEqual(cleared.status_code, 200)
+        self.assertIsNone(cleared.json["task"]["description"])
 
-    def test_history_and_hours_modules_respect_volunteer_scope(self):
-        """History/hours modules restrict Volunteer to own records and allow Admin lookup."""
-        manager = history.History()
+        self.assertEqual(self.call("DELETE", path, "admin").status_code, 200)
+        stored = self.db.row("tasks", row["id"])
+        self.assertIsNotNone(stored["deleted_at"])
+        self.assertEqual(stored["deleted_by"], self.actors["admin"]["id"])
+        for actor in ("admin", "alice"):
+            self.assertEqual(self.call("GET", path, actor).status_code, 404)
+            listed = self.call("GET", "/api/tasks", actor).json["tasks"]
+            self.assertNotIn(row["id"], [task["id"] for task in listed])
+        self.assertEqual(self.call("PATCH", path, "admin", json={"title": "Not restored"}).status_code, 404)
+        self.assertEqual(self.call("DELETE", path, "admin").status_code, 404)
+        self.assertEqual(stored["title"], "Edited task")
+
+    def test_task_detail_visibility_and_admin_mutation_permissions(self):
+        """Task details follow list visibility; Volunteer task management requests cannot change rows."""
+        before = deepcopy(self.db.tables["tasks"])
+        available, _, assigned, completed, deleted = self.task_ids
+        for actor, visible in (("alice", {available}), ("admin", {available, assigned, completed})):
+            for task_id in (available, assigned, completed, deleted):
+                expected = 200 if task_id in visible else 404
+                self.assertEqual(self.call("GET", f"/api/tasks/{task_id}", actor).status_code, expected)
+        for method, path in (("POST", "/api/tasks"), ("PUT", f"/api/tasks/{available}"),
+                             ("PATCH", f"/api/tasks/{available}"), ("DELETE", f"/api/tasks/{available}")):
+            self.assertEqual(self.call(method, path, "alice", json={"title": "Denied"}).status_code, 403)
+        self.assertEqual(self.db.tables["tasks"], before)
+
+    def test_task_api_rejects_invalid_payloads_and_ids(self):
+        """Only valid title and description updates reach the task manager."""
+        before = deepcopy(self.db.tables["tasks"])
+        path = f"/api/tasks/{self.task_ids[0]}"
+        for method, url, payload in (
+            ("POST", "/api/tasks", {"description": "Missing title"}),
+            ("POST", "/api/tasks", {"title": " "}),
+            ("POST", "/api/tasks", {"title": "Valid", "status": "completed"}),
+            ("PATCH", path, {}),
+            ("PATCH", path, {"description": 5}),
+            ("PATCH", path, {"title": None}),
+        ):
+            self.assertEqual(self.call(method, url, "admin", json=payload).status_code, 400)
+        self.assertEqual(self.call("GET", "/api/tasks/not-a-uuid", "admin").status_code, 400)
+        self.assertEqual(self.db.tables["tasks"], before)
+
+    def test_history_and_hours_api_scope(self):
+        """Volunteers see only their own records; Admin can look up any volunteer."""
         alice_id, bob_id, admin_id = (self.actors[name]["id"] for name in ("alice", "bob", "admin"))
-        self.assertEqual(manager.track_volunteer_hours(alice_id, volunteer_id=bob_id)["total_hours"], 1.5)
-        self.assertEqual(manager.track_volunteer_hours(bob_id)["total_hours"], 0)
-        self.assertEqual(manager.track_volunteer_hours(admin_id, volunteer_id=alice_id)["total_hours"], 1.5)
-        self.assertIsNone(manager.track_volunteer_hours(admin_id))
-        self.assertEqual(len(manager.service_history(alice_id, volunteer_id=bob_id)), 1)
-        self.assertEqual(manager.service_history(bob_id), [])
-        self.assertEqual(len(manager.service_history(admin_id)), 1)
-        self.assertEqual(self.call("GET", "/api/history", "alice").status_code, 404)
-        self.assertEqual(self.call("GET", "/api/hours", "alice").status_code, 404)
+        self.assertEqual(self.call("POST", f"/api/tasks/{self.task_ids[2]}/cancel", "bob").status_code, 200)
+        for actor, volunteer_id, status, hours in (("alice", alice_id, "completed", 1.5),
+                                                  ("bob", bob_id, "cancelled", 0)):
+            records = self.call("GET", "/api/history", actor).json["history"]
+            self.assertEqual([(row["volunteer_id"], row["status"]) for row in records], [(volunteer_id, status)])
+            total = self.call("GET", "/api/hours", actor).json
+            self.assertEqual((total["volunteer_id"], total["total_hours"]), (volunteer_id, hours))
+            targeted = self.call("GET", "/api/history", "admin", query_string={"volunteer_id": volunteer_id})
+            self.assertEqual(targeted.json["history"], records)
+            targeted_hours = self.call("GET", "/api/hours", "admin", query_string={"volunteer_id": volunteer_id})
+            self.assertEqual(targeted_hours.json, total)
+        combined = self.call("GET", "/api/history", "admin").json["history"]
+        self.assertEqual({row["volunteer_id"] for row in combined}, {alice_id, bob_id})
+        self.assertEqual(self.call("GET", "/api/hours", "admin").status_code, 400)
+        for path in ("/api/history", "/api/hours"):
+            self.assertEqual(self.call("GET", path, "alice", query_string={"volunteer_id": bob_id}).status_code, 403)
+            self.assertEqual(self.call("GET", path, "admin", query_string={"volunteer_id": "bad"}).status_code, 400)
+        self.assertEqual(self.call("GET", "/api/history", "admin", query_string={"volunteer_id": admin_id}).json["history"], [])
 
     def test_partial_profile_update_preserves_existing_fields(self):
-        """Defect check: editing first_name must preserve email, last_name, and phone."""
-        manager = account.Account()
+        """Profile editing changes only supplied fields on the authenticated user's own profile."""
         alice_id = self.actors["alice"]["id"]
-        before = deepcopy(self.db.row("profiles", alice_id))
-        self.assertTrue(manager.update_profile(alice_id, first_name="Updated"))
+        bob_id = self.actors["bob"]["id"]
+        row = self.db.row("profiles", alice_id)
+        row["phone"] = "555-0100"
+        before = deepcopy(row)
+        bob_before = deepcopy(self.db.row("profiles", bob_id))
+        response = self.call("PATCH", "/api/profile", "alice", json={"first_name": " Updated "})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json["profile"]["id"], alice_id)
         after = self.db.row("profiles", alice_id)
-        self.observations.append("After first_name-only update: " + str({key: after[key] for key in ("email", "first_name", "last_name", "phone")}))
         self.assertEqual(after["first_name"], "Updated")
         for key in ("email", "last_name", "phone"):
             self.assertEqual(after[key], before[key], f"Unspecified field {key} was overwritten")
+        cleared = self.call("PATCH", "/api/profile", "alice", json={"phone": " "})
+        self.assertEqual(cleared.json["profile"]["phone"], "")
+        self.assertEqual(self.db.row("profiles", bob_id), bob_before)
+
+    def test_profile_api_rejects_identity_and_auth_field_changes(self):
+        """Profile edits reject account IDs, roles, login email, and empty names."""
+        before = deepcopy(self.db.tables["profiles"])
+        for payload in ({"user_id": self.actors["bob"]["id"], "first_name": "Denied"},
+                        {"role": "admin"}, {"email": "another@cic-mock.example"}, {"first_name": " "}):
+            self.assertEqual(self.call("PATCH", "/api/profile", "alice", json=payload).status_code, 400)
+        self.assertEqual(self.db.tables["profiles"], before)
 
     def test_password_reset_is_mocked_and_logout_route_responds(self):
         """Reset request reaches mock Auth; logout responds for either role without sending email."""

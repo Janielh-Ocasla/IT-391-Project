@@ -19,20 +19,47 @@
             <img src="{{ url_for('static', filename='images/Logo.png') }}" alt="CIC Logo">
         </a>
 
-        <div class="member-header-buttons">
-            <a href="/account" class="account-button">Account Settings</a>
-            <a href="/" class="signout-button" data-signout>Sign Out</a>
+        <div class="account-menu" data-account-menu hidden>
+            <button type="button" class="account-trigger" aria-haspopup="true" aria-expanded="false">
+                <span class="account-avatar" aria-hidden="true">👤</span>
+                <span class="account-label">Account</span>
+                <span class="account-caret" aria-hidden="true">▾</span>
+            </button>
+            <div class="account-dropdown" role="menu">
+                <div class="account-dropdown-head">
+                    <span class="account-avatar lg" aria-hidden="true">👤</span>
+                    <div>
+                        <p class="account-name">Your account</p>
+                        <p class="account-role" data-account-role>Signed in</p>
+                    </div>
+                </div>
+                <a href="/account" class="account-item" role="menuitem"><span class="ico">⚙️</span> Account settings</a>
+                <button type="button" class="account-item" role="menuitem" data-account-reset><span class="ico">🔑</span> Reset password</button>
+                <div class="account-reset" hidden>
+                    <form id="account-reset-form">
+                        <input type="email" placeholder="Your email address" aria-label="Email for reset link" required>
+                        <button type="submit">Send reset link</button>
+                    </form>
+                    <p id="account-reset-msg" class="account-msg" role="status"></p>
+                </div>
+                <a href="/account#profile" class="account-item" role="menuitem"><span class="ico">👤</span> Edit profile</a>
+                <a href="/account#notifications" class="account-item" role="menuitem"><span class="ico">🔔</span> Notification preferences</a>
+                <a href="/faq" class="account-item" role="menuitem"><span class="ico">❓</span> Help &amp; FAQ</a>
+                <div class="account-divider"></div>
+                <a href="/" class="account-item danger" role="menuitem" data-signout><span class="ico">↩</span> Sign out</a>
+            </div>    
         </div>
     </header>
 
 
     <!-- Dashboard strip: change these links to match your admin pages -->
-    <nav class="dashboard-strip">
-        <a href="/admin">Home</a>
+    <nav class="dashboard-strip" aria-label="Member dashboard">
         <a href="/announcements">Announcements</a>
         <a href="/tasks">Tasks</a>
         <a href="/admin/history" class="active">History</a>
+        <a href="/member_donate">Donate</a>
         <a href="/services">Services</a>
+        <a href="/faq">FAQ / Help</a>
     </nav>
 
 
@@ -109,10 +136,90 @@
     </main>
 
 
-    <footer class="member-footer">
-        <p>Community Innovation Center | CIC</p>
-    </footer>
+<!-- ===== CIC site footer — sticks to bottom on short pages ===== -->
+<style>
+  /* Pin footer to the bottom even when page content is short */
+  body { display: flex; flex-direction: column; min-height: 100vh; margin: 0; }
+  body > header, body > nav { flex-shrink: 0; }
+  body > main, body > .page, body > section:not(.site-footer) { flex: 1 0 auto; }
 
+  .site-footer { flex-shrink: 0; background: #14233a; color: #cfd8e6; padding: 40px 0 24px; }
+  .site-footer a { color: #fff; text-decoration: none; }
+  .site-footer a:hover { text-decoration: underline; }
+  .footer-inner { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+  .footer-grid {
+    display: flex; flex-wrap: wrap; gap: 32px 48px; justify-content: space-between;
+  }
+  .footer-brand { flex: 1 1 260px; max-width: 340px; }
+  .footer-brand img { height: 44px; width: auto; background: #fff; border-radius: 10px; padding: 4px 8px; }
+  .footer-brand p { margin: 12px 0 0; font-size: 0.9rem; line-height: 1.5; color: #cfd8e6; }
+  .footer-contact a { font-size: 0.9rem; }
+  .footer-social { display: flex; gap: 16px; margin-top: 12px; font-size: 0.9rem; }
+
+  .footer-col { flex: 1 1 180px; }
+  .footer-col h3 { margin: 0 0 14px; color: #fff; font-size: 1.05rem; letter-spacing: 0.02em; }
+  .footer-col ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .footer-col ul a { font-size: 0.92rem; }
+
+  .footer-form { display: grid; gap: 10px; }
+  .footer-form input, .footer-form textarea {
+    width: 100%; padding: 10px 12px; font: inherit; color: #fff;
+    background: #1c3151; border: 1px solid #2c4a73; border-radius: 10px; outline: none;
+  }
+  .footer-form input::placeholder, .footer-form textarea::placeholder { color: #9fb0c8; }
+  .footer-form textarea { resize: vertical; min-height: 64px; }
+  .footer-send {
+    justify-self: end; font: inherit; font-weight: 600; cursor: pointer;
+    padding: 9px 20px; border: none; border-radius: 10px; background: #2f80ed; color: #fff;
+  }
+  .footer-send:hover { background: #1f5fae; }
+
+  .footer-copy {
+    margin: 28px 0 0; padding-top: 16px; border-top: 1px solid #2c4a73;
+    text-align: center; font-size: 0.82rem; color: #9fb0c8;
+  }
+  @media (max-width: 560px) { .footer-send { justify-self: stretch; } }
+</style>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-grid">
+
+      <div class="footer-brand">
+        <img alt="Community Innovation Center" src="{{ url_for('static', filename='images/Logo.png') }}">
+        <p>Connecting volunteers with food pantry deliveries across Chicago.</p>
+        <p class="footer-contact"><a href="mailto:innovationcenter1050@gmail.com">innovationcenter1050@gmail.com</a></p>
+        <div class="footer-social">
+          <a href="https://www.facebook.com/profile.php?id=61564768987902" rel="noopener">Facebook</a>
+          <a href="https://www.instagram.com/communityinnovationcenter/" rel="noopener">Instagram</a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h3>Quick Links</h3>
+        <ul>
+          <li><a href="/admin">Home</a></li>
+          <li><a href="/announcements">Announcements</a></li>
+          <li><a href="/tasks">Tasks</a></li>
+          <li><a href="/admin/history">History</a></li>
+          <li><a href="/member_donate">Donate</a></li>
+          <li><a href="/faq">FAQ</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h3>Contact Us</h3>
+        <form class="footer-form" action="mailto:innovationcenter1050@gmail.com" method="post" enctype="text/plain">
+          <input type="email" name="email" placeholder="Your email address" aria-label="Your email address" required>
+          <textarea name="message" rows="3" placeholder="Message..." aria-label="Message" required></textarea>
+          <button type="submit" class="footer-send">Send</button>
+        </form>
+      </div>
+
+    </div>
+    <p class="footer-copy">&copy; Community Innovation Center · Chicago, Illinois</p>
+  </div>
+</footer>
 
     <!-- Filter: hides rows that don't match the chosen volunteer -->
     <script>
@@ -128,5 +235,6 @@
 
     <script src="{{ url_for('static', filename='js/api.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/site.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/account_menu.js') }}" defer></script>
 </body>
 </html>

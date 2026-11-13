@@ -20,8 +20,8 @@
       <a href="index.html">Home</a>
       <a href="about.html" class="active" aria-current="page">About</a>
       <a href="donate.html">Donate</a>
-      <a href="#">Volunteer Hub</a>
-      <a href="#">Members</a>
+      <a href="{{ url_for('volunteer_page') }}">Volunteer Hub</a>
+      <a href="{{ url_for('member_dashboard') }}">Members</a>
     </nav>
     <button class="btn btn-primary" id="openLogin">Login/Signup</button>
   </header>
@@ -123,8 +123,8 @@
         </div>
         <p class="lead">Ready to make a difference in your neighborhood? There's a place for you on our team.</p>
         <div class="cta-row">
-          <a class="btn btn-light" href="#">Volunteer with us</a>
-          <a class="btn btn-outline" href="#">Donate</a>
+          <a class="btn btn-light" href="{{ url_for('volunteer_page') }}">Volunteer with us</a>
+          <a class="btn btn-outline" href="{{ url_for('donate_page') }}">Donate</a>
         </div>
       </div>
     </section>

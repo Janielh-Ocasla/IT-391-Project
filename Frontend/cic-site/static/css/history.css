@@ -195,8 +195,12 @@ td.empty {
         padding: 18px 14px;
     }
 
-    .dashboard-strip {
-        padding: 8px 16px;
+    .filter-bar {
+        flex-wrap: wrap;
+    }
+
+    .filter-bar select {
+        min-height: 44px;
     }
 
 }

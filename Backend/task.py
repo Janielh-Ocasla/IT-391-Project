@@ -45,7 +45,7 @@ class Task:
         :param user_id: ID of the admin creating the task
         :param title: Title of the task
         :param description: description of the task
-        :return: True if task created, False otherwise
+        :return: the created task, or False on failure
         """
         try:
             if not self.is_admin(user_id):
@@ -64,9 +64,11 @@ class Task:
                 "created_by": user_id
             }
             # insert new task into the database
-            self.supabase.table("tasks").insert(task_data).execute()
+            response = self.supabase.table("tasks").insert(task_data).execute()
+            if not response.data:
+                return False
             print("Task created successfully.")
-            return True
+            return response.data[0]
         except Exception as e:
             print(f"An error occurred during task creation: {e}")
             return False
@@ -79,7 +81,7 @@ class Task:
         :param task_id: ID of the task to edit
         :param title: new title for the task
         :param description: new description for the task
-        :return: True if task updated, False otherwise
+        :return: the updated task, None if not found, or False on failure
         """ 
         try:
             if not self.is_admin(user_id):
@@ -105,14 +107,15 @@ class Task:
                 self.supabase.table("tasks")
                 .update(updates)
                 .eq("id", task_id)
+                .is_("deleted_at", "null")
                 .execute()
             )
             # check if the task was found and updated
             if not response.data:
                 print("Task not found or you do not have permission to edit it.")
-                return False
+                return None
             print("Task updated successfully.")
-            return True
+            return response.data[0]
         except Exception as e:
             print(f"An error occurred while editing the task: {e}")
             return False
@@ -123,7 +126,7 @@ class Task:
 
         :param user_id: ID of the admin deleting the task
         :param task_id: ID of the task to delete
-        :return: True if task deleted, False otherwise
+        :return: True if task deleted, None if not found, or False on failure
         """ 
         try:
             if not self.is_admin(user_id):
@@ -143,36 +146,32 @@ class Task:
             # check if the task was found and deleted
             if not response.data:
                 print("Task not found or you do not have permission to delete it.")
-                return False
+                return None
             print("Task deleted successfully.")
             return True
         except Exception as e:
             print(f"An error occurred while deleting the task: {e}")
             return False
 
-    def task_info(self, task_id): 
+    def task_info(self, task_id, *, open_only=False):
         """
         shows the details of a task or return None if not found
         can be checked by both admin and volunteer
 
         :param task_id: ID of the task to view
+        :param open_only: restrict visibility to available tasks for volunteers
         :return: Task information if found, None otherwise
         """
-        try:
-            # find the task using its ID and get the details
-            response = (
-                self.supabase.table("tasks")
-                .select("*")
-                .eq("id", task_id)
-                .is_("deleted_at", "null")
-                .single()
-                .execute()
-            )
-            # return task information
-            return response.data
-        except Exception as e:
-            print(f"Could not get task information: {e}")
-            return None
+        query = (
+            self.supabase.table("tasks")
+            .select("*")
+            .eq("id", task_id)
+            .is_("deleted_at", "null")
+        )
+        if open_only:
+            query = query.eq("status", "open")
+        rows = query.limit(1).execute().data
+        return rows[0] if rows else None
 
     def list_task(self, user_id): 
         """

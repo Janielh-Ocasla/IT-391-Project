@@ -59,11 +59,11 @@ test('volunteer login navigates to the member URL', async () => {
   assert.deepEqual(page.navigations, ['/member']);
 });
 
-test('admin login navigates to the completed admin history URL', async () => {
+test('admin login navigates to the admin dashboard URL', async () => {
   const page = browser({ role: 'admin' });
   await tick();
   await page.submit();
-  assert.deepEqual(page.navigations, ['/admin/history']);
+  assert.deepEqual(page.navigations, ['/admin']);
 });
 
 test('failed login stays on the page and displays the existing API error', async () => {
