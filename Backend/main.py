@@ -44,7 +44,7 @@ MEMBER_TEMPLATES = {
     "account": "unavailable.html",
     "services": "unavailable.html",
     "faq": "unavailable.html",
-    "admin": None,
+    "admin": "admin_dashboard.html",
 }
 UNAVAILABLE_PAGES = {
     "account": ("Account Settings", "Account settings are not available on the website yet."),
@@ -348,14 +348,16 @@ def get_member_page(page_name):
             role = profile.data.get("role") if profile.data else None
         if role not in {"admin", "volunteer"}:
             return jsonify({"error": "Account profile is unavailable"}), 403
-        if page_name == "admin" or (role == "admin" and page_name in {"member", "history"}):
+        if role == "admin" and page_name == "member":
+            return jsonify({"redirect": "/admin"}), 200
+        if role == "admin" and page_name == "history":
             return jsonify({"redirect": "/admin/history"}), 200
 
         context = {}
         if page_name in UNAVAILABLE_PAGES:
             heading, message = UNAVAILABLE_PAGES[page_name]
             context = {"heading": heading, "message": message,
-                       "dashboard_endpoint": "admin_history" if role == "admin" else "member_dashboard"}
+                       "dashboard_endpoint": "admin_dashboard" if role == "admin" else "member_dashboard"}
         elif page_name == "tasks":
             context = {"can_pick_tasks": role == "volunteer"}
         elif page_name == "history":

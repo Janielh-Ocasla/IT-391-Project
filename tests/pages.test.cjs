@@ -87,8 +87,14 @@ test('the admin landing response navigates to the completed admin history URL', 
   assert.deepEqual(result.navigations, ['/admin/history']);
 });
 
+test('the member page redirect sends an admin to the admin dashboard', async () => {
+  const result = await load({ page: 'member', data: { ok: true, redirect: '/admin' } });
+  assert.deepEqual(result.renders, []);
+  assert.deepEqual(result.navigations, ['/admin']);
+});
+
 test('invalid page responses are never rendered or followed as redirects', async () => {
-  for (const fields of [{}, { html: [] }, { html: '' }, { redirect: 'https://example.com' }]) {
+  for (const fields of [{}, { html: [] }, { html: '' }, { redirect: 'https://example.com' }, { redirect: '/member' }]) {
     const result = await load({ data: { ok: true, ...fields } });
     assert.deepEqual(result.renders, []);
     assert.deepEqual(result.navigations, []);

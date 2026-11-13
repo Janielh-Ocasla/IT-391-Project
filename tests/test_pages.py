@@ -125,15 +125,32 @@ class PageTests(unittest.TestCase):
                     with self.client.get(asset) as asset_response:
                         self.assertEqual(asset_response.status_code, 200, asset)
 
-    def test_admin_navigation_targets_completed_admin_history(self):
+    def test_admin_navigation_targets_completed_admin_pages(self):
         headers = self.login(self.admin)
-        for page in ('member', 'history', 'admin'):
+        expected = {'member': '/admin', 'history': '/admin/history'}
+        for page, target in expected.items():
             with self.subTest(page=page):
                 response = self.client.get('/api/pages/' + page, headers=headers)
                 self.assertEqual(response.status_code, 200)
-                self.assertEqual(response.json, {'ok': True, 'redirect': '/admin/history'})
-        for page in ('history-admin', 'tasks', 'announcement', 'member_donate'):
-            self.assertEqual(self.client.get('/api/pages/' + page, headers=headers).status_code, 200)
+                self.assertEqual(response.json, {'ok': True, 'redirect': target})
+        for page in ('admin', 'history-admin', 'tasks', 'announcement', 'member_donate'):
+            with self.subTest(page=page):
+                response = self.client.get('/api/pages/' + page, headers=headers)
+                self.assertEqual(response.status_code, 200)
+                self.assertNotIn('redirect', response.json)
+
+    def test_admin_dashboard_loads_for_admin_with_all_local_assets(self):
+        headers = self.login(self.admin)
+        response = self.client.get('/api/pages/admin', headers=headers)
+        self.assertEqual(response.status_code, 200)
+        html = response.json['html']
+        self.assertIn('Admin Dashboard', html)
+        self.assertNotIn(self.db.token(self.admin['id']), html)
+        parser = Assets()
+        parser.feed(html)
+        for asset in parser.urls:
+            with self.client.get(asset) as asset_response:
+                self.assertEqual(asset_response.status_code, 200, asset)
 
     def test_tasks_page_loads_its_case_sensitive_asset_and_exposes_pickup_only_to_volunteers(self):
         for actor, can_pick in ((self.alice, 'true'), (self.admin, 'false')):
@@ -274,7 +291,7 @@ class PageTests(unittest.TestCase):
                 self.assertEqual(clients[0].options.headers['Authorization'], headers['Authorization'])
 
     def test_unfinished_entries_explain_status_and_return_to_the_correct_dashboard(self):
-        for actor, endpoint in ((self.alice, 'member_dashboard'), (self.admin, 'admin_history')):
+        for actor, endpoint in ((self.alice, 'member_dashboard'), (self.admin, 'admin_dashboard')):
             headers = self.login(actor)
             for page in ('account', 'services', 'faq'):
                 with self.subTest(role=actor['role'], page=page):
