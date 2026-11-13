@@ -13,11 +13,15 @@ from tests.test_api import Assets
 
 PAGE_URLS = {
     'member': ('/member', '/member.html'),
+    'tasks': ('/tasks', '/task.html'),
     'history': ('/history', '/history.html'),
     'history-admin': ('/admin/history', '/history-admin', '/history-admin.html'),
     'admin': ('/admin',),
     'announcement': ('/announcements', '/announcement', '/announcement.html'),
     'member_donate': ('/member_donate', '/member_donate.html'),
+    'account': ('/account', '/account.html'),
+    'services': ('/services', '/services.html'),
+    'faq': ('/faq', '/faq.html'),
 }
 
 
@@ -73,7 +77,8 @@ class PageTests(unittest.TestCase):
                         self.assertIn(f'data-cic-page="{page}"', html)
                         self.assertIn('/static/js/pages.js', html)
                         self.assertLess(html.index('/static/js/api.js'), html.index('/static/js/pages.js'))
-                        for private_text in ('Member Dashboard', 'Volunteer History', 'Your Completed Tasks', '[MOCK CIC]', self.alice['email']):
+                        for private_text in ('Volunteer Dashboard', 'Volunteer History', 'Your Completed Tasks',
+                                             'Available Tasks', '[MOCK CIC]', self.alice['email']):
                             self.assertNotIn(private_text, html)
                         parser = Assets()
                         parser.feed(html)
@@ -106,7 +111,7 @@ class PageTests(unittest.TestCase):
 
     def test_volunteer_can_load_completed_templates_and_all_local_assets(self):
         headers = self.login()
-        for page in ('member', 'history', 'announcement', 'member_donate'):
+        for page in ('member', 'tasks', 'history', 'announcement', 'member_donate', 'account', 'services', 'faq'):
             with self.subTest(page=page):
                 response = self.client.get('/api/pages/' + page, headers=headers)
                 self.assertEqual(response.status_code, 200)
@@ -127,8 +132,20 @@ class PageTests(unittest.TestCase):
                 response = self.client.get('/api/pages/' + page, headers=headers)
                 self.assertEqual(response.status_code, 200)
                 self.assertEqual(response.json, {'ok': True, 'redirect': '/admin/history'})
-        for page in ('history-admin', 'announcement', 'member_donate'):
+        for page in ('history-admin', 'tasks', 'announcement', 'member_donate'):
             self.assertEqual(self.client.get('/api/pages/' + page, headers=headers).status_code, 200)
+
+    def test_tasks_page_loads_its_case_sensitive_asset_and_exposes_pickup_only_to_volunteers(self):
+        for actor, can_pick in ((self.alice, 'true'), (self.admin, 'false')):
+            with self.subTest(role=actor['role']):
+                html, _ = self.rendered('tasks', self.login(actor))
+                self.assertIn(f'data-can-pick="{can_pick}"', html)
+                parser = Assets()
+                parser.feed(html)
+                script = next(url for url in parser.urls if url.lower() == '/static/js/task.js')
+                # A macOS test client can serve the wrong case from disk; Render cannot.
+                self.assertIn(script.rsplit('/', 1)[-1],
+                              {path.name for path in (main.SITE_DIR / 'static/js').iterdir()})
 
     def test_volunteer_cannot_load_admin_templates_or_spoof_role(self):
         headers = self.login()
@@ -256,11 +273,21 @@ class PageTests(unittest.TestCase):
                 self.assertEqual(clients[0].user_id, actor['id'])
                 self.assertEqual(clients[0].options.headers['Authorization'], headers['Authorization'])
 
-    def test_unfinished_templates_and_unknown_page_names_stay_unavailable(self):
+    def test_unfinished_entries_explain_status_and_return_to_the_correct_dashboard(self):
+        for actor, endpoint in ((self.alice, 'member_dashboard'), (self.admin, 'admin_history')):
+            headers = self.login(actor)
+            for page in ('account', 'services', 'faq'):
+                with self.subTest(role=actor['role'], page=page):
+                    html, context = self.rendered(page, headers)
+                    self.assertIn('not available', html)
+                    self.assertIn('Back to dashboard', html)
+                    self.assertEqual(context['dashboard_endpoint'], endpoint)
+
+    def test_unknown_page_names_stay_unavailable(self):
         headers = self.login()
-        for path in ('/account', '/tasks', '/task.html', '/services', '/services.html', '/faq', '/faq.html'):
+        for path in ('/missing', '/base.html'):
             self.assertEqual(self.client.get(path).status_code, 404, path)
-        for page in ('account', 'task', 'services', 'faq', 'base', 'missing'):
+        for page in ('task', 'base', 'missing'):
             response = self.client.get('/api/pages/' + page, headers=headers)
             self.assertEqual(response.status_code, 404, page)
             self.assertNotIn('html', response.json)

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ heading }} | CIC</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/site.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/member.css') }}">
+</head>
+<body>
+    <header class="member-header">
+        <a href="{{ url_for(dashboard_endpoint) }}" class="member-logo">
+            <img src="{{ url_for('static', filename='images/Logo.png') }}" alt="CIC dashboard">
+        </a>
+        <div class="member-header-buttons">
+            <a href="{{ url_for('home') }}" class="signout-button" data-signout>Sign Out</a>
+        </div>
+    </header>
+    <main class="member-dashboard">
+        <div class="dashboard-heading">
+            <h1>{{ heading }}</h1>
+            <p>{{ message }}</p>
+        </div>
+        <a class="btn btn-primary" href="{{ url_for(dashboard_endpoint) }}">Back to dashboard</a>
+    </main>
+    <script src="{{ url_for('static', filename='js/api.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/site.js') }}" defer></script>
+</body>
+</html>

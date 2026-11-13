@@ -17,7 +17,7 @@
                 <img src="{{ url_for('static', filename='images/Logo.png') }}" alt="Community Innovation Center Logo" class="logo">
             </a>
         </div>
-        <button id="login-button">Login / Sign Up</button>
+        <button class="btn btn-primary" id="login-button">Login / Sign Up</button>
     </nav>
 
     <main>
@@ -25,7 +25,7 @@
         <nav class="member-strip" aria-label="Member dashboard">
             <a href="member.html">Home</a>
             <a href="announcement.html">Announcements</a>
-            <a href="task.html" class="current" aria-current="page">Tasks</a>
+            <a href="/tasks" class="current" aria-current="page">Tasks</a>
             <a href="history.html">History</a>
             <a href="member_donate.html">Donate</a>
             <a href="services.html">Service Requests</a>
@@ -34,9 +34,9 @@
 
         <div class="task-wrap">
             <header class="task-header">
-                <p class="task-eyebrow">Volunteer dashboard</p>
-                <h1>Available Tasks</h1>
-                <p class="task-intro">Browse open delivery tasks and see what's happening in the community.</p>
+                <p class="task-eyebrow">{{ "Volunteer dashboard" if can_pick_tasks else "Admin dashboard" }}</p>
+                <h1>{{ "Available Tasks" if can_pick_tasks else "Tasks" }}</h1>
+                <p class="task-intro">{{ "Browse open delivery tasks and see what’s happening in the community." if can_pick_tasks else "Review delivery tasks and community updates." }}</p>
             </header>
 
             <!-- Task search bar -->
@@ -53,8 +53,8 @@
 
                 <!-- Left panel -->
                 <section class="task-panel" aria-labelledby="available-heading">
-                    <h2 id="available-heading" class="panel-title">Available Tasks</h2>
-                    <div id="task-list" class="panel-body"></div>
+                    <h2 id="available-heading" class="panel-title">{{ "Available Tasks" if can_pick_tasks else "Delivery Tasks" }}</h2>
+                    <div id="task-list" class="panel-body" data-can-pick="{{ 'true' if can_pick_tasks else 'false' }}"></div>
                     <p id="task-empty" class="panel-empty" hidden>No tasks match your search.</p>
                 </section>
 
@@ -90,7 +90,7 @@
                     <ul>
                         <li><a href="member.html">Home</a></li>
                         <li><a href="announcement.html">Announcements</a></li>
-                        <li><a href="task.html">Tasks</a></li>
+                        <li><a href="/tasks">Tasks</a></li>
                         <li><a href="history.html">History</a></li>
                         <li><a href="member_donate.html">Donate</a></li>
                         <li><a href="faq.html">FAQ</a></li>
@@ -112,6 +112,6 @@
 
     <script src="{{ url_for('static', filename='js/api.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/site.js') }}" defer></script>
-    <script src="{{ url_for('static', filename='js/task.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/Task.js') }}" defer></script>
 </body>
 </html>
