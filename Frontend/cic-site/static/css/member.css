@@ -189,6 +189,8 @@
 
     .member-header {
         padding: 12px 16px;
+        flex-wrap: wrap;
+        gap: 8px 12px;
     }
 
     .member-logo img {
@@ -196,11 +198,16 @@
     }
 
     .member-header-buttons {
+        flex-wrap: wrap;
         gap: 6px;
+        margin-left: auto;
     }
 
     .account-button,
     .signout-button {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
         padding: 9px 12px;
         font-size: 0.8rem;
     }

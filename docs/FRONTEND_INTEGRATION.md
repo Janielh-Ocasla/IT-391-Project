@@ -44,11 +44,15 @@ API that supplies all protected markup and data. JavaScript is required.
 | Donate | `/donate`, `/donate.html` | Public page |
 | Volunteer | `/volunteer`, `/volunteer.html` | Existing public design |
 | Member Dashboard | `/member`, `/member.html` | `member`: volunteer; admins go to Admin History |
+| Tasks | `/tasks`, `/task.html` | `tasks`: volunteers can pick up open tasks; admins can view tasks |
 | History | `/history`, `/history.html` | `history`: own completed work; admins go to Admin History |
 | Admin History | `/admin/history`, `/history-admin`, `/history-admin.html` | `history-admin`: admin only |
 | Admin landing | `/admin` | `admin`: admin only; redirects to Admin History |
 | Announcements | `/announcements`, `/announcement`, `/announcement.html` | `announcement`: admin or volunteer |
 | Member Donations | `/member_donate`, `/member_donate.html` | `member_donate`: admin or volunteer |
+| Account Settings | `/account`, `/account.html` | `account`: member placeholder |
+| Services | `/services`, `/services.html` | `services`: member placeholder |
+| FAQ / Help | `/faq`, `/faq.html` | `faq`: member placeholder |
 
 Login navigation uses the role returned by the existing backend: volunteers go
 to `/member`, admins to `/admin/history`. The API also resolves admin requests
@@ -75,9 +79,10 @@ of pretending that a user's history is empty.
 
 ## Remaining gaps and ownership
 
-- Account Settings has no template. Tasks, Services, and FAQ templates are empty.
-  Their existing links remain 404s. No unfinished workflow or placeholder feature
-  was added; existing task and assignment APIs remain available.
+- Account Settings, Services, and FAQ show an unavailable message and a link
+  back to the appropriate dashboard. Their full browser features are pending.
+  Task management, profile edits, history, and hours are available through the
+  JSON endpoints in [the API contract](API.md).
 - There is no separate admin dashboard design; Admin History is the landing page.
 - Token expiry, refresh, logout revocation, and session-storage policy are unchanged
   and remain the cybersecurity teammate's responsibility.
@@ -95,14 +100,22 @@ python -m unittest discover -s tests -v
 node --test tests/*.test.cjs
 ```
 
-All **60 Python tests and 21 JavaScript tests pass**, with no failures or skips.
-The original authentication/role workflow tests are retained. New tests cover
+The original authentication/role workflow tests are retained. Page tests cover
 neutral page URLs, protected template loading, both dashboard destinations,
 volunteer/admin authorization, invalid tokens, real History data mapping, empty
 and failed queries, HTML escaping, and verified-JWT database reads. Loader tests
 execute the unchanged API client to check bearer headers and cookie omission.
 Python connections/DNS are blocked and JavaScript network requests are mocked.
 
-The integration is based on `origin/main` at `9f4f0e0`. Teammates' CSS and image
-assets are unchanged. No schema changes, live database changes, or deployments
-are included. The feature branch targets `main` for review; merging is separate.
+Responsive verification used WebKit and Chromium with 21 viewport/browser
+combinations and 22 public, Volunteer, and Admin route/role checks per viewport
+(462 in total). This included iPad mini (744×1133), iPad (820×1180), older and
+larger iPads in both orientations, 320–700px tablet windows, mobile phones,
+Android tablet, and desktop. Checks covered page overflow, overlapping header
+controls, dialogs, task search, and the admin history filter. The history table
+can scroll within its own container if needed. Flask checks also verified all
+30 registered page URLs, including aliases. Tests use mock accounts and
+substitute for external images and services; they do not certify real devices,
+production authentication, or third-party forms.
+
+No schema changes, live database changes, or deployments are included.

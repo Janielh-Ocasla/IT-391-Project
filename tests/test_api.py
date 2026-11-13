@@ -83,19 +83,25 @@ class ApiTests(unittest.TestCase):
     def test_protected_endpoints_require_token_before_client_creation(self):
         paths = (
             ("GET", "/api/tasks"), ("GET", "/api/announcements"),
+            ("POST", "/api/tasks"),
+            *((method, f"/api/tasks/{TASK_ID}") for method in ("GET", "PUT", "PATCH", "DELETE")),
+            ("PATCH", "/api/profile"), ("GET", "/api/history"), ("GET", "/api/hours"),
             ("POST", "/api/announcements"), ("PUT", f"/api/announcements/{TASK_ID}"),
             ("DELETE", f"/api/announcements/{TASK_ID}"),
             ("GET", "/api/assignments/status"),
             *(('POST', f'/api/tasks/{TASK_ID}/{action}') for action in ('pick', 'cancel', 'submit', 'photo')),
             ("POST", f"/api/assignments/{TASK_ID}/verify"),
         )
-        with patch.multiple(main, Task=MagicMock(), Announcement=MagicMock(), Assignment=MagicMock()):
+        with patch.multiple(main, Task=MagicMock(), Announcement=MagicMock(), Assignment=MagicMock(),
+                            Account=MagicMock(), History=MagicMock()):
             for method, path in paths:
                 with self.subTest(path=path, method=method):
                     self.check_json(self.client.open(path, method=method), 401)
             main.Task.assert_not_called()
             main.Announcement.assert_not_called()
             main.Assignment.assert_not_called()
+            main.Account.assert_not_called()
+            main.History.assert_not_called()
 
     def test_login_validation_and_token_response(self):
         with patch.object(main, "Account", return_value=self.manager):

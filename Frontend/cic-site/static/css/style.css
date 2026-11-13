@@ -1,5 +1,9 @@
 :root {
     --main-color: #00155c;
+    --secondary-color: rgb(92, 125, 235);
+    --accent-color: rgb(0, 132, 255);
+    --section-color-1: rgb(131, 195, 255);
+    --background-color-1: rgb(176, 217, 255);
 }
 
 * {
@@ -15,14 +19,13 @@ body {
 /*-----Header-----*/
 .header {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 24px;
     padding: 12px 24px;
-    position: fixed;
+    position: sticky;
     top: 0;
-    left: 0;
-    width: 100%;         
-    height: 120px;
+    min-height: 120px;
     background-color: #ffffff;
     z-index: 1000;
     border-bottom: 2px solid var(--main-color);
@@ -43,9 +46,12 @@ body {
 }
 
 .nav-links {
+    flex: 1;
+    min-width: 0;
     padding: 0;
     list-style: none;
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     align-items: center;
     gap: 16px;
@@ -101,24 +107,17 @@ body {
     transition: color 0.3s;
 }
 
-#openLogin {
-    position: absolute;
-    top: 50%;
-    right: 40px;
-    transform: translateY(-50%);
+.header > button {
+    margin-left: auto;
 }
 
 #openLogin:hover {
     background-color: #1877f2;
 }
 
-main {
-    padding-top: 120px; 
-}
-
 section {
-    padding-top: 60px;
-    padding-bottom: 60px;
+    padding-top: 20px;
+    padding-bottom: 20px;
 }
 
 /*-----Overview Section-----*/
@@ -129,53 +128,36 @@ section {
     justify-content: center;
     align-items: center;
     color: var(--main-color);
+    padding: clamp(24px, 4vw, 56px) clamp(16px, 5vw, 48px);
+    gap: 24px;
+}
+
+#cic-overview h1 {
+    max-width: 35ch;
+    font-size: clamp(1.5rem, 3vw, 2.25rem);
+    text-align: center;
 }
 
 .overview {
-    display: flex;
-    flex-direction: row;
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
     align-items: center;
-    width: 100%;
-    padding: 30px 200px;
-    gap: 30px;
+    width: min(100%, 1200px);
+    gap: clamp(20px, 4vw, 48px);
 }
 
-section:not(#wip) div.overview-paragraph {
+.overview-paragraph {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    text-align: justify;
-
-    flex: auto;
-    min-width: 0;
-    gap: 20px;
+    line-height: 1.6;
+    gap: 16px;
 }
 
 .overview img {
-    flex: auto;
-    min-width: 0;
-    width: 5000px;
+    display: block;
+    width: 100%;
     height: auto;
-    max-width: 70%;
-    object-fit: contain;
     border-radius: 10px;
-}
-
-/*-----Styles for Work In Progress pages*/
-section#wip{
-    height: 80vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    gap: 10px;
-}
-
-section#wip img{
-    background-color: rgb(189, 189, 189);
-    width: 50vh;
-    height: auto;
 }
 
 /*-----Call to Action Section-----*/
@@ -188,45 +170,40 @@ section#wip img{
     background-color: rgb(174, 216, 255);
     border-top: 1px solid black;
     border-bottom: 1px solid black;
-    padding: 50px;
+    padding: clamp(24px, 5vw, 50px) clamp(16px, 5vw, 48px);
     gap: 20px;
+    text-align: center;
 }
 
-.cards {
-    display: flex;
-    flex-direction: row;
-    gap: 30px;
-    align-items: center;
-    justify-content: center;
-}
-
-.cards div {
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5), 0 1px 0 rgba(255, 255, 255, 0.8);
+#call-to-action .cards {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: min(100%, 1100px);
+    gap: clamp(16px, 4vw, 30px);
 }
 
 #call-to-action .cards > div {
     background-color: white;
-    border-color: black;
-    width: 40vw;
     border-radius: 10px;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 30px;
-    padding: 20px;
+    gap: 12px;
+    padding: clamp(12px, 3vw, 20px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5), 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 #call-to-action .cards > div img {
     border-radius: 10px;
     width: 100%;
-    height: 40vh;
+    aspect-ratio: 16 / 10;
     object-fit: cover;
 }
 
 #call-to-action a {
     text-transform: uppercase;
-    font-size: 50px;
+    font-size: clamp(1.4rem, 4vw, 2.75rem);
+    padding: 8px 0;
     color: var(--main-color);
     text-decoration: none;
     position: relative;
@@ -255,18 +232,18 @@ section#wip img{
     display: flex;
     flex-direction: column;
     align-items: center;
-    height: 100vh;
+    gap: 16px;
+    padding: clamp(24px, 4vw, 48px) clamp(16px, 5vw, 48px);
 }
 
 .scroll-box {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    width: 80vw;
-    height: 80vh;
+    width: min(100%, 1100px);
+    max-height: min(80vh, 52rem);
     border-radius: 10px;
-    overflow-y: scroll;
-    overflow-x: hidden;
+    overflow: auto;
     border: 1px solid #ccc;
     padding: 20px;
     background-color: #e4e7eb;
@@ -304,9 +281,8 @@ section#wip img{
 }
 
 .scroll-box img {
-    width: 400px;
-    height: 225px;
-    flex-shrink: 0;
+    width: 100%;
+    aspect-ratio: 16 / 9;
     object-fit: cover;
     display: block;
     border-radius: 12px;
@@ -314,7 +290,13 @@ section#wip img{
 
 .scroll-box article > a,
 .scroll-box article > img {
-    flex: 0 0 400px;
+    flex: 0 0 40%;
+    min-width: 0;
+    align-self: start;
+}
+
+.scroll-box article > img {
+    width: 40%;
 }
 
 .scroll-box .article-info {
@@ -331,25 +313,25 @@ section#wip img{
 
 /* ---------- Footer ---------- */
 .site-footer { background: #14233a; color: #cfd8e6; padding: 40px 0;}
-.footer-grid { display: flex; flex-wrap: wrap; gap: 24px 48px; justify-content: space-between; align-items: center; margin-left: 50px; margin-right: 50px;}
+.footer-grid { display: flex; flex-wrap: wrap; gap: 24px 48px; justify-content: space-between; align-items: center; margin-inline: clamp(16px, 5vw, 50px); }
 .site-footer a { color: #fff; }
 .site-footer img { height: 44px; width: auto; background: #fff; border-radius: 10px; padding: 4px 8px; }
 .footer-links { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 0; padding: 0; list-style: none; }
-.footer-copy { margin: 24px 0 0; font-size: 0.85rem; color: #9fb0c8; margin-left: 45px;}
+.footer-copy { margin: 24px clamp(16px, 5vw, 50px) 0; font-size: 0.85rem; color: #9fb0c8; }
 
 /*------Donate Page-----*/
 #donate {
-    height: 135vh;
     display: flex;
     flex-direction: column;
     text-align: center;
     align-items: center;
-    gap: 30px;
+    gap: clamp(20px, 4vw, 30px);
+    padding: clamp(24px, 5vw, 56px) clamp(16px, 5vw, 48px);
     color: var(--main-color);
 }
 
 #donate h1 {
-    font-size: 80px;
+    font-size: clamp(2rem, 7vw, 5rem);
 }
 
 #donate img{
@@ -361,7 +343,7 @@ section#wip img{
     flex-direction: column;
     align-items: center;
     text-align: left;
-    width: 300px;
+    width: min(100%, 320px);
     gap: 15px;
 }
 
@@ -375,23 +357,163 @@ section#wip img{
 }
 
 #donation-location {
-    font-size: 30px;
-    padding-top: 40px;
+    max-width: 65ch;
+    font-size: clamp(1rem, 2.5vw, 1.875rem);
+    line-height: 1.5;
 }
 
 #monetary-donations {
-    margin: 30px;
-    font-size: 30px;
+    width: min(100%, 680px);
+    overflow-wrap: anywhere;
+    font-size: clamp(1rem, 2.5vw, 1.875rem);
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 20px;
     box-shadow: 0 2px 25px rgba(0, 0, 0, 0.5), 0 1px 0 rgba(255, 255, 255, 0.8);
     border-radius: 15px;
-    padding: 30px;
+    padding: clamp(16px, 4vw, 30px);
 }
 
 #monetary-donations img {
     width: 50px;
     height: auto;
+}
+
+/*-----Volunteer Page-----*/
+#volunteer-header {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: var(--main-color);
+    text-align: center;
+}
+
+#volunteer-header h1 {
+    font-size: clamp(2rem, 7vw, 5rem);
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+#volunteer-header > h1,
+#volunteer-header > h2 {
+    padding-inline: 16px;
+}
+
+#volunteer-header h2 {
+    color: var(--secondary-color);
+}
+
+#outer-section {
+    background-color: var(--section-color-1);
+    width: 100%;
+    padding: clamp(16px, 4vw, 36px);
+    margin-top: 10px;
+    text-align: center;
+}
+
+#create-account {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: min(100%, 840px);
+    margin: 0 auto;
+    padding: clamp(16px, 4vw, 28px);
+    gap: 15px;
+    border: 2pt solid var(--main-color);
+    background-color: white;
+    border-radius: 12px;
+}
+
+#create-account h1 {
+    font-size: 2rem;
+    color: var(--main-color);
+}
+
+#create-account button {
+    color: white;
+    padding: 10px;
+    max-width: 100%;
+    min-height: 44px;
+    border-radius: 30px;
+    background-color: var(--accent-color);
+    border: 3px solid var(--secondary-color);
+}
+
+#create-account p {
+    font-size: 1.25rem;
+    color: var(--accent-color);
+}
+
+#create-account button:hover {
+    border: 3px solid var(--accent-color);
+    background-color: var(--secondary-color);
+    cursor: pointer;
+}
+
+#volunteer-opportunities {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    margin-bottom: 30px;
+    gap: 25px;
+    padding-inline: clamp(16px, 5vw, 48px);
+}
+
+#tasks {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    width: min(100%, 1200px);
+    margin-inline: auto;
+    gap: clamp(16px, 3vw, 25px);
+}
+
+.example-card {
+    background-color: var(--background-color-1);
+    display: flex;
+    flex-direction: column;
+    border: 3px solid var(--main-color);
+    border-radius: 12px;
+    padding: clamp(14px, 2.5vw, 30px);
+    gap: 14px;
+}
+
+.example-card img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    margin-top: auto;
+    border-radius: 8px;
+}
+
+@media (max-width: 900px) {
+    .header {
+        position: static;
+        min-height: 0;
+        gap: 4px 12px;
+        padding: 10px 16px;
+    }
+
+    .header .logo { height: 48px; }
+    .header .nav-links { order: 1; flex-basis: 100%; justify-content: flex-start; gap: 0 14px; }
+    .header .nav-divider { display: none; }
+    .header-box { padding: 0; }
+    .header-box a { display: inline-flex; align-items: center; min-height: 44px; font-size: 1rem; }
+}
+
+@media (max-width: 760px) {
+    .overview { grid-template-columns: minmax(0, 1fr); }
+    #tasks { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .scroll-box { max-height: none; overflow: visible; padding: 12px; }
+    .scroll-box article { flex-direction: column; padding: 12px; }
+    .scroll-box article > a,
+    .scroll-box article > img { width: 100%; flex: none; }
+    .article-title h1 { font-size: 1.15rem; line-height: 1.35; }
+}
+
+@media (max-width: 550px) {
+    #call-to-action .cards, #tasks { grid-template-columns: minmax(0, 1fr); }
 }

@@ -12,16 +12,15 @@ Every test gets a fresh copy of the fixture.
 
 ## Result
 
-23 / 23 scenario checks passed;
+30 / 30 scenario checks passed;
 0 failed; 0 errors.
 
-**Passing the checks below does not mean registration is enabled.** Some checks
-verify and document a blocked or missing feature, as identified in this table.
+Passing the checks below verifies the application against the mock; it does not
+verify the configuration of a live Supabase project.
 
 | Feature | Volunteer | Admin | Level of verification |
 | --- | --- | --- | --- |
-| Public registration | BLOCKED: `/api/register` and `/api/signup` return 503 | BLOCKED: same 503; no separate Admin signup route | Actual Flask routes with mock data |
-| Account creation method | Creates a Volunteer when Auth and profile writes succeed | Method always assigns `volunteer`; Admin is pre-seeded for other tests | Business module only; not public registration |
+| Public registration | Both signup routes create a volunteer profile through the mocked Auth trigger | No separate Admin signup; public signup cannot grant Admin access | Actual Flask routes with mock data |
 | Login and current identity | PASS for both seeded Volunteers | PASS for seeded Admin | Real routes and Account code, mock Auth |
 | Task visibility | Only open, undeleted tasks | All undeleted tasks | Real route and Task queries |
 | Pick / cancel | PASS, including reopening for another Volunteer | 403 for Volunteer-only routes | Real route and row mutations |
@@ -29,9 +28,9 @@ verify and document a blocked or missing feature, as identified in this table.
 | Delivery review | Cannot review: 403 | Approve, reject, resubmit, approve: PASS | Assignment and task states checked |
 | Assignment scope | Can see own rows; cannot mutate another Volunteer's work | Can see everyone's assignments | Filters checked without simulated RLS hiding mistakes |
 | Announcements | Can read; create/edit/delete return 403 | Create, edit, delete: PASS | Real routes and announcement rows |
-| Task CRUD | Denied by business module | Module works; create/detail/edit/delete API routes are NOT EXPOSED (405/404) | Module and route availability checked separately |
-| History / volunteer hours | Module scopes records to self | Module supports Admin lookup | Module only; `/api/history` and `/api/hours` return 404 |
-| Profile edit | Partial update preserves omitted fields after fix | Same Account method | Module only; no profile-edit API is exposed |
+| Task management | Can read open tasks; create/edit/delete return 403 | Can create, read, edit, and soft-delete tasks | Real routes and task rows |
+| History / estimated hours | Own records only | Can look up volunteers; history also supports an unfiltered lookup | Real routes and assignment rows |
+| Profile edit | Own name and phone; omitted fields are preserved | Same own-profile endpoint | Real route and profile rows |
 | Password reset / logout | Mock reset call and logout route work | Logout route works | No real email, token revocation, or recovery page tested |
 
 ## Defects reproduced and fixed
@@ -44,21 +43,18 @@ verify and document a blocked or missing feature, as identified in this table.
    HTTP 409 before touching Storage. The regression test also checks that no image
    or assignment data is changed.
 
-## Registration gap that remains
+## Registration and profiles
 
-The public API deliberately remains paused. The mock also reproduces a separate
-failure case in the existing Account method: Auth signup succeeds, profile insert
-fails, and an Auth record remains without a profile. No rollback is implemented.
-This is a simulated profile write failure, **not proof of the live project's RLS
-or trigger configuration**. Admin enrollment and Auth/Profile synchronization
-still need an explicit implementation before enabling registration.
+The signup routes rely on the configured Supabase Auth trigger to create
+volunteer profiles. The mock tests exercise email confirmation, duplicate
+registration, and rollback when profile creation fails. Updating a profile's
+name or phone does not modify the account's login email or role.
 
 ## Limits
 
 The mock models the repository's database calls and shared state, not Supabase's
 actual RLS policies, mail delivery, email confirmation links, database constraints,
-Storage bucket settings, concurrency, or browser dashboards. Seeded Admin/Volunteer
-accounts do not establish that either role can publicly register. Live Auth/Storage
+Storage bucket settings, concurrency, or browser dashboards. Live Auth/Storage
 flows still need separate verification using confirmed test accounts.
 
 ## Reproduce
@@ -66,7 +62,7 @@ flows still need separate verification using confirmed test accounts.
 ```sh
 python -m scripts.verify_mock_roles
 python -m unittest discover -s tests -v
-node --test tests/api-client.test.cjs
+node --test tests/*.test.cjs
 ```
 
 Machine-readable observations: [mock_verification.json](mock_verification.json).
@@ -75,24 +71,31 @@ Machine-readable observations: [mock_verification.json](mock_verification.json).
 
 | Scenario | Result |
 | --- | --- |
-| Module only: volunteer creation, profile normalization, and later API login work. | PASS |
+| Account sends normalized signup metadata; the trigger creates the profile. | PASS |
 | Admin can create/edit/delete announcements; Volunteer can read the changes. | PASS |
 | Admin receives 403 for Volunteer-only pick/cancel/upload/submit actions. | PASS |
 | Admin rejection returns assignment to assigned; Volunteer can resubmit and be approved. | PASS |
-| Module CRUD works and enforces roles; task creation/detail/edit/delete APIs are missing. | PASS |
+| Admin can publish, view, edit, and soft-delete a task through the API. | PASS |
 | Duplicate picking and picking deleted tasks do not create assignments. | PASS |
 | Volunteer sees own assignments; Admin sees both volunteers' assignments. | PASS |
+| Even direct mock Auth signup metadata cannot assign an Admin profile role. | PASS |
 | Seeded Admin and Volunteer can log in and retrieve their own identity. | PASS |
 | Cancellation preserves the old assignment and lets another volunteer pick the reopened task. | PASS |
 | Duplicate email registration through the account module is rejected. | PASS |
-| History/hours modules restrict Volunteer to own records and allow Admin lookup. | PASS |
+| Case/whitespace variants of an existing email fail without changing its data. | PASS |
+| Volunteers see only their own records; Admin can look up any volunteer. | PASS |
 | Invalid/expired tokens cannot read tasks or current identity. | PASS |
+| A trigger error after the profile write also restores the complete transaction. | PASS |
 | Volunteer cannot cancel or submit another volunteer's assignment. | PASS |
-| Defect check: editing first_name must preserve email, last_name, and phone. | PASS |
+| Profile editing changes only supplied fields on the authenticated user's own profile. | PASS |
 | Reset request reaches mock Auth; logout responds for either role without sending email. | PASS |
-| Registration risk: failed profile insert leaves an Auth account without a profile. | PASS |
-| No Admin signup exists; Account.create_account always assigns volunteer. | PASS |
-| Registration status: both roles and both aliases return 503; no rows are created. | PASS |
+| Profile edits reject account IDs, roles, login email, and empty names. | PASS |
+| Failed profile creation rolls back signup; retry creates one Auth/profile pair. | PASS |
+| Caller-supplied Admin roles on either alias create volunteers without Admin access. | PASS |
+| Both aliases create Auth/profile rows; confirmation enables login and identity lookup. | PASS |
+| Both aliases report trigger failures without leaving orphaned Auth/profile rows. | PASS |
+| Only valid title and description updates reach the task manager. | PASS |
+| Task details follow list visibility; Volunteer task management requests cannot change rows. | PASS |
 | Volunteer sees open tasks; Admin sees all undeleted tasks. | PASS |
 | Unconfirmed email, unknown email, and bad password cannot log in. | PASS |
 | Defect check: uploading to another volunteer's task must return 403/409, not 500. | PASS |

@@ -62,7 +62,8 @@ and response shapes. The shared browser client is
 - Completed member pages load through the existing Bearer-token API. Initial page
   URLs contain only a neutral loader; protected templates and History data require
   authorization. See [frontend integration](docs/FRONTEND_INTEGRATION.md).
-- Registration remains paused pending the existing Auth/Profile setup decision.
+- Public registration creates volunteer accounts and requires the configured
+  Supabase profile creation trigger.
 
 # Tests
 
@@ -83,6 +84,6 @@ python -m scripts.verify_mock_roles
 ```
 
 See [docs/MOCK_VERIFICATION.md](docs/MOCK_VERIFICATION.md) for results, including
-blocked registration and business methods that do not yet have API routes.
+registration, task management, profile editing, and volunteer history.
 The mock uses fictional data from `tests/fixtures/role_scenarios.json`, runs the
 real business classes, and blocks all network connections during each scenario.
