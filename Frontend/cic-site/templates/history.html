@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/history.css') }}">
 </head>
 
-<body>
+<body class="page-with-sticky-footer">
 
     <!-- Top bar: logo + account buttons -->
     <header class="member-header">
@@ -126,11 +126,6 @@
 
 <!-- ===== CIC site footer — sticks to bottom on short pages ===== -->
 <style>
-  /* Pin footer to the bottom even when page content is short */
-  body { display: flex; flex-direction: column; min-height: 100vh; margin: 0; }
-  body > header, body > nav { flex-shrink: 0; }
-  body > main, body > .page, body > section:not(.site-footer) { flex: 1 0 auto; }
-
   .site-footer { flex-shrink: 0; background: #14233a; color: #cfd8e6; padding: 40px 0 24px; }
   .site-footer a { color: #fff; text-decoration: none; }
   .site-footer a:hover { text-decoration: underline; }

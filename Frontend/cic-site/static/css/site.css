@@ -82,6 +82,17 @@ input, select, textarea { min-width: 0; max-width: 100%; }
   .navbar .btn { margin-left: auto; padding: 10px 16px; }
 }
 
+/* Opt in to a footer that reaches the bottom of short pages. */
+body.page-with-sticky-footer {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.page-with-sticky-footer > :where(header, nav, footer) { flex-shrink: 0; }
+.page-with-sticky-footer > main { flex: 1 0 auto; }
+
 /* The member pages share a footer with a contact form. */
 .footer-inner {
   width: min(100%, 1160px);
