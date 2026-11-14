@@ -96,8 +96,8 @@ body {
 }
 
 .nav-divider {
-    font-size: 50px;
-    transform: translateY(-15px);
+    font-size: 30px;
+    transform: translateY(-5px);
     color: var(--main-color);
 }
 
@@ -432,7 +432,7 @@ section {
     color: var(--main-color);
 }
 
-#create-account button {
+#create-account a {
     color: white;
     padding: 10px;
     max-width: 100%;
@@ -447,7 +447,7 @@ section {
     color: var(--accent-color);
 }
 
-#create-account button:hover {
+#create-account a:hover {
     border: 3px solid var(--accent-color);
     background-color: var(--secondary-color);
     cursor: pointer;
@@ -474,8 +474,9 @@ section {
     background-color: var(--background-color-1);
     display: flex;
     flex-direction: column;
-    width: 30vw;
-    height: 70vh;
+    width: 100%;
+    min-width: 0;
+    height: auto;
     border: 3px solid var(--main-color);
     border-radius: 12px;
     padding: clamp(14px, 2.5vw, 30px);
@@ -519,7 +520,6 @@ section {
 @media (max-width: 550px) {
     #call-to-action .cards, #tasks { grid-template-columns: minmax(0, 1fr); }
 }
-}
 
 .example-card h3 {
     color: var(--main-color);
@@ -538,4 +538,189 @@ section {
     border: 3px solid var(--accent-color);
     background-color: var(--secondary-color);
     cursor: pointer;
+}
+
+/*-----Member Pages Footer-----*/
+/* Pin footer to the bottom even when page content is short */
+html, body { height: 100%; }
+body { display: flex; flex-direction: column; min-height: 100vh; margin: 0; }
+body > main, body > .page, body > section:not(.site-footer) { flex: 1 0 auto; }
+
+.site-footer { flex-shrink: 0; background: #14233a; color: #cfd8e6; padding: 40px 0 24px; }
+.site-footer a { color: #fff; text-decoration: none; }
+.site-footer a:hover { text-decoration: underline; }
+.footer-inner { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+.footer-grid {
+display: flex; flex-wrap: wrap; gap: 32px 48px; justify-content: space-between;
+}
+.footer-brand { flex: 1 1 260px; max-width: 340px; }
+.footer-brand img { height: 44px; width: auto; background: #fff; border-radius: 10px; padding: 4px 8px; }
+.footer-brand p { margin: 12px 0 0; font-size: 0.9rem; line-height: 1.5; color: #cfd8e6; }
+.footer-contact a { font-size: 0.9rem; }
+.footer-social { display: flex; gap: 16px; margin-top: 12px; font-size: 0.9rem; }
+
+.footer-col { flex: 1 1 180px; }
+.footer-col h3 { margin: 0 0 14px; color: #fff; font-size: 1.05rem; letter-spacing: 0.02em; }
+.footer-col ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.footer-col ul a { font-size: 0.92rem; }
+
+.footer-form { display: grid; gap: 10px; }
+.footer-form input, .footer-form textarea {
+width: 100%; padding: 10px 12px; font: inherit; color: #fff;
+background: #1c3151; border: 1px solid #2c4a73; border-radius: 10px; outline: none;
+}
+.footer-form input::placeholder, .footer-form textarea::placeholder { color: #9fb0c8; }
+.footer-form textarea { resize: vertical; min-height: 64px; }
+.footer-send {
+justify-self: end; font: inherit; font-weight: 600; cursor: pointer;
+padding: 9px 20px; border: none; border-radius: 10px; background: #2f80ed; color: #fff;
+}
+.footer-send:hover { background: #1f5fae; }
+
+.footer-copy {
+margin: 28px 0 0; padding-top: 16px; border-top: 1px solid #2c4a73;
+text-align: center; font-size: 0.82rem; color: #9fb0c8;
+}
+@media (max-width: 560px) { .footer-send { justify-self: stretch; } }
+
+/*-----Member Header-----*/
+.member-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 5%;
+    background-color: #ffffff;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.member-logo img {
+    height: 55px;
+    width: auto;
+    display: block;
+}
+
+.member-header-buttons {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.account-button,
+.signout-button {
+    text-decoration: none;
+    padding: 11px 20px;
+    border-radius: 24px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: 0.2s;
+}
+
+.account-button {
+    color: #1f5fae;
+    background-color: #e8f0fa;
+}
+
+.account-button:hover {
+    background-color: #d6e5f7;
+}
+
+.signout-button {
+    color: #ffffff;
+    background-color: #1f5fae;
+}
+
+.signout-button:hover {
+    background-color: #174a8a;
+}
+
+/*-----Dashboard Strip-----*/
+.dashboard-strip {
+  display: flex;
+  flex-shrink: 0;            
+  gap: 8px;
+  padding: 10px 5%;
+  background-color: #f5f7fa;
+  border-bottom: 1px solid #e5e5e5;
+  overflow-x: auto;
+}
+.dashboard-strip a {
+  white-space: nowrap;
+  text-decoration: none;
+  color: #1a1a1a;
+  font-weight: 500;
+  font-size: 0.92rem;
+  padding: 8px 16px;
+  border-radius: 20px;
+  transition: 0.2s;
+}
+.dashboard-strip a:hover { background-color: #e8f0fa; color: #1f5fae; }
+.dashboard-strip a.active { background-color: #1f5fae; color: #ffffff; }
+@media (max-width: 550px) { .dashboard-strip { padding: 8px 16px; } }
+.member-header { flex-shrink: 0; }
+
+/*-----Services Page-----*/
+#service-request {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 15px;
+}
+
+#service-request h1 {
+    color: var(--text);
+    font-size: 2rem;
+}
+
+#service-request p {
+    color: var(--muted);
+    font-size: 1rem;
+}
+
+#service-categories {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-content: center;
+    gap: 20px;
+}
+
+.service-category {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: space-between;
+    text-align: center;
+    border: 1px solid var(--solid);
+    border-radius: 12px;
+    flex: 1;
+}
+
+/*-----FAQ Page-----*/
+#faq {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 80%;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+}
+
+.question:not(:last-child) {
+    border-bottom: 1px solid var(--border);
+}
+
+.question {
+    padding-bottom: 8px;
+}
+
+.question h3 {
+    margin-top: 0;
+    margin-bottom: 8px;
+}
+
+.question p {
+    margin: 0;
 }

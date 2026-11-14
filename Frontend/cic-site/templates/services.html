@@ -9,52 +9,109 @@
 </head>
 <body>
     <!--Header-->
-    <nav class="header">
-        <div class="logo-container">
-            <a href="home.html">
-                <img src="{{ url_for('static', filename='images/Logo.png') }}" alt="Community Innovation Center Logo" class="logo">
-            </a>
+        <!-- Top bar: logo + account menu -->
+    <header class="member-header">
+        <a href="/member" class="member-logo">
+            <img src="{{ url_for('static', filename='images/Logo.png') }}" alt="CIC Logo">
+        </a>
+
+        <div class="account-menu" data-account-menu hidden>
+            <button type="button" class="account-trigger" aria-haspopup="true" aria-expanded="false">
+                <span class="account-avatar" aria-hidden="true">👤</span>
+                <span class="account-label">Account</span>
+                <span class="account-caret" aria-hidden="true">▾</span>
+            </button>
+            <div class="account-dropdown" role="menu">
+                <div class="account-dropdown-head">
+                    <span class="account-avatar lg" aria-hidden="true">👤</span>
+                    <div>
+                        <p class="account-name">Your account</p>
+                        <p class="account-role" data-account-role>Signed in</p>
+                    </div>
+                </div>
+                <a href="/account" class="account-item" role="menuitem"><span class="ico">⚙️</span> Account settings</a>
+                <button type="button" class="account-item" role="menuitem" data-account-reset><span class="ico">🔑</span> Reset password</button>
+                <div class="account-reset" hidden>
+                    <form id="account-reset-form">
+                        <input type="email" placeholder="Your email address" aria-label="Email for reset link" required>
+                        <button type="submit">Send reset link</button>
+                    </form>
+                    <p id="account-reset-msg" class="account-msg" role="status"></p>
+                </div>
+                <a href="/account#profile" class="account-item" role="menuitem"><span class="ico">👤</span> Edit profile</a>
+                <a href="/account#notifications" class="account-item" role="menuitem"><span class="ico">🔔</span> Notification preferences</a>
+                <a href="/faq" class="account-item" role="menuitem"><span class="ico">❓</span> Help &amp; FAQ</a>
+                <div class="account-divider"></div>
+                <a href="/" class="account-item danger" role="menuitem" data-signout><span class="ico">↩</span> Sign out</a>
+            </div>
         </div>
-    
-
-        <!--Login/Signup-->
-        <button class="btn btn-primary" id="openLogin">Login / Signup</button>
-
-    </nav>
+    </header>
 
     <main>
         <section id="service-request">
             <h1>Service Request</h1>
             <p>Suggest a service that we can provide for our community</p>
-            <div class="service-category">
-                <h3>Community Drives/Fundraisers</h3>
-            </div>
-            <div class="service-category">
-                <h3>Community Events</h3>
-            </div>
-            <div class="service-category">
-                <h3>Recommendations/Other</h3>
+            <div id="service-categories">
+                <div class="service-category">
+                    <h3>Community Drives/Fundraisers</h3>
+                    <img src="{{ url_for('static', filename='images/Community_Drive.jpg') }}" alt="Community Drive Image">
+                    <a target="_blank" rel="noopener noreferrer">Suggest Service</a>
+                </div>
+                <div class="service-category">
+                    <h3>Community Events</h3>
+                    <img src="{{ url_for('static', filename='images/Community_Events.jpg') }}" alt="Community Events Image">
+                    <a target="_blank" rel="noopener noreferrer">Suggest Service</a>
+                </div>
+                <div class="service-category">
+                    <h3>Recommendations/Other</h3>
+                    <img src="{{ url_for('static', filename='images/Other.jpg') }}" alt="Other Image">
+                    <a target="_blank" rel="noopener noreferrer"> Suggest Service</a>
+                </div>
             </div>
         </section>
     </main>
 
     <!-- ===== Footer ===== -->
     <footer class="site-footer">
-        <div class="container">
+    <div class="footer-inner">
         <div class="footer-grid">
-            <img alt="Community Innovation Center"
-                src="https://static.wixstatic.com/media/c5f985_712eb51acfae41ef9dacca664413c454~mv2.png/v1/fill/w_980,h_509,al_c,q_90/transparent%20logo_edited.png" />
-            <ul class="footer-links">
-            <li><a href="mailto:innovationcenter1050@gmail.com">innovationcenter1050@gmail.com</a></li>
-            <li><a href="https://www.facebook.com/profile.php?id=61564768987902" rel="noopener">Facebook</a></li>
-            <li><a href="https://www.instagram.com/communityinnovationcenter/" rel="noopener">Instagram</a></li>
-            <li><a href="#">Terms &amp; Conditions</a></li>
-            <li><a href="#">Privacy Policy</a></li>
+
+        <div class="footer-brand">
+            <img alt="Community Innovation Center" src="{{ url_for('static', filename='images/Logo.png') }}">
+            <p>Connecting volunteers with food pantry deliveries across Chicago.</p>
+            <p class="footer-contact"><a href="mailto:innovationcenter1050@gmail.com">innovationcenter1050@gmail.com</a></p>
+            <div class="footer-social">
+            <a href="https://www.facebook.com/profile.php?id=61564768987902" rel="noopener">Facebook</a>
+            <a href="https://www.instagram.com/communityinnovationcenter/" rel="noopener">Instagram</a>
+            </div>
+        </div>
+
+        <div class="footer-col">
+            <h3>Quick Links</h3>
+            <ul>
+            <li><a href="member.html">Home</a></li>
+            <li><a href="announcement.html">Announcements</a></li>
+            <li><a href="task.html">Tasks</a></li>
+            <li><a href="history.html">History</a></li>
+            <li><a href="member_donate.html">Donate</a></li>
+            <li><a href="faq.html">FAQ</a></li>
             </ul>
         </div>
-        <p class="footer-copy">Chicago, Illinois</p>
+
+        <div class="footer-col">
+            <h3>Contact Us</h3>
+            <form class="footer-form" action="mailto:innovationcenter1050@gmail.com" method="post" enctype="text/plain">
+            <input type="email" name="email" placeholder="Your email address" aria-label="Your email address" required>
+            <textarea name="message" rows="3" placeholder="Message..." aria-label="Message" required></textarea>
+            <button type="submit" class="footer-send">Send</button>
+            </form>
         </div>
+
+        </div>
+        <p class="footer-copy">&copy; Community Innovation Center · Chicago, Illinois</p>
+    </div>
     </footer>
+
 
     <script src="{{ url_for('static', filename='js/api.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/site.js') }}" defer></script>
