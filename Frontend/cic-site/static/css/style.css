@@ -541,16 +541,11 @@ section {
 }
 
 /*-----Member Pages Footer-----*/
-/* Pin footer to the bottom even when page content is short */
-html, body { height: 100%; }
-body { display: flex; flex-direction: column; min-height: 100vh; margin: 0; }
-body > main, body > .page, body > section:not(.site-footer) { flex: 1 0 auto; }
-
-.site-footer { flex-shrink: 0; background: #14233a; color: #cfd8e6; padding: 40px 0 24px; }
-.site-footer a { color: #fff; text-decoration: none; }
-.site-footer a:hover { text-decoration: underline; }
+:where(.page-with-sticky-footer) .site-footer { flex-shrink: 0; background: #14233a; color: #cfd8e6; padding: 40px 0 24px; }
+:where(.page-with-sticky-footer) .site-footer a { color: #fff; text-decoration: none; }
+:where(.page-with-sticky-footer) .site-footer a:hover { text-decoration: underline; }
 .footer-inner { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
-.footer-grid {
+:where(.page-with-sticky-footer) .footer-grid {
 display: flex; flex-wrap: wrap; gap: 32px 48px; justify-content: space-between;
 }
 .footer-brand { flex: 1 1 260px; max-width: 340px; }
@@ -577,7 +572,7 @@ padding: 9px 20px; border: none; border-radius: 10px; background: #2f80ed; color
 }
 .footer-send:hover { background: #1f5fae; }
 
-.footer-copy {
+:where(.page-with-sticky-footer) .footer-copy {
 margin: 28px 0 0; padding-top: 16px; border-top: 1px solid #2c4a73;
 text-align: center; font-size: 0.82rem; color: #9fb0c8;
 }
