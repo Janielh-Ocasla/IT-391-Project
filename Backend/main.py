@@ -42,8 +42,8 @@ MEMBER_TEMPLATES = {
     "announcement": "announcement.html",
     "member_donate": "member_donate.html",
     "account": "unavailable.html",
-    "services": "unavailable.html",
-    "faq": "unavailable.html",
+    "services": "services.html",
+    "faq": "faq.html",
     "admin": "admin_dashboard.html",
 }
 UNAVAILABLE_PAGES = {

@@ -679,6 +679,7 @@ text-align: center; font-size: 0.82rem; color: #9fb0c8;
     justify-content: center;
     align-content: center;
     gap: 20px;
+    margin: 20px;
 }
 
 .service-category {
@@ -690,6 +691,9 @@ text-align: center; font-size: 0.82rem; color: #9fb0c8;
     border: 1px solid var(--solid);
     border-radius: 12px;
     flex: 1;
+    border: 1px solid var(--border);
+    padding: 30px;
+    gap: 15px;
 }
 
 /*-----FAQ Page-----*/
@@ -697,23 +701,34 @@ text-align: center; font-size: 0.82rem; color: #9fb0c8;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    align-items: center;
     width: 80%;
     padding: 10px;
     border: 1px solid var(--border);
     border-radius: 12px;
+    margin: 30px auto;
+    gap: 30px;
+    padding-top: 50px;
 }
+
+#faq h1 {
+    text-align: center;
+    font-size: 2rem;
+}
+
+.question {
+    padding-bottom: 80px;
+    margin: 20px;
+}
+
 
 .question:not(:last-child) {
     border-bottom: 1px solid var(--border);
 }
 
-.question {
-    padding-bottom: 8px;
-}
-
 .question h3 {
     margin-top: 0;
-    margin-bottom: 8px;
+    margin-bottom: 20px;
 }
 
 .question p {

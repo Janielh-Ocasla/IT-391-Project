@@ -52,13 +52,14 @@
         <a href="/announcements">Announcements</a>
         <a href="/tasks">Tasks</a>
         <a href="/history">History</a>
-        <a href="/member_donate" class="active" aria-current="page">Donate</a>
+        <a href="/member_donate">Donate</a>
         <a href="/services">Services</a>
-        <a href="/faq">FAQ / Help</a>
+        <a href="/faq" class="active" aria-current="page">FAQ / Help</a>
     </nav>
 
     <main>
         <section id="faq">
+            <h1>Frequently Asked Questions</h1>
             <div class="question">
                 <h3>Example Question 1</h3>
                 <p>lorem ipsum dolor sit amet consectetur adipiscing elit eu et deserunt adipiscing excepteur aut occaecat eos proident eum est ullamco voluptas dolor eiusmod in et pariatur sit nulla nihil sed</p>
@@ -117,5 +118,6 @@
 
     <script src="{{ url_for('static', filename='js/api.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/site.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/account_menu.js') }}" defer></script>
 </body>
 </html>
