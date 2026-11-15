@@ -47,6 +47,16 @@
         </div>
     </header>
 
+    <!-- Dashboard strip -->
+    <nav class="dashboard-strip" aria-label="Member dashboard">
+        <a href="/announcements">Announcements</a>
+        <a href="/tasks">Tasks</a>
+        <a href="/history">History</a>
+        <a href="/member_donate">Donate</a>
+        <a href="/services" class="active" aria-current="page">Services</a>
+        <a href="/faq">FAQ / Help</a>
+    </nav>
+
     <main>
         <section id="service-request">
             <h1>Service Request</h1>
@@ -55,17 +65,17 @@
                 <div class="service-category">
                     <h3>Community Drives/Fundraisers</h3>
                     <img src="{{ url_for('static', filename='images/Community_Drive.jpg') }}" alt="Community Drive Image">
-                    <a target="_blank" rel="noopener noreferrer">Suggest Service</a>
+                    <a target="_blank" rel="noopener noreferrer" class="btn btn-primary">Suggest Service</a>
                 </div>
                 <div class="service-category">
                     <h3>Community Events</h3>
                     <img src="{{ url_for('static', filename='images/Community_Events.jpg') }}" alt="Community Events Image">
-                    <a target="_blank" rel="noopener noreferrer">Suggest Service</a>
+                    <a target="_blank" rel="noopener noreferrer" class="btn btn-primary">Suggest Service</a>
                 </div>
                 <div class="service-category">
                     <h3>Recommendations/Other</h3>
                     <img src="{{ url_for('static', filename='images/Other.jpg') }}" alt="Other Image">
-                    <a target="_blank" rel="noopener noreferrer"> Suggest Service</a>
+                    <a target="_blank" rel="noopener noreferrer" class="btn btn-primary"> Suggest Service</a>
                 </div>
             </div>
         </section>
@@ -115,5 +125,6 @@
 
     <script src="{{ url_for('static', filename='js/api.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/site.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/account_menu.js') }}" defer></script>
 </body>
 </html>
