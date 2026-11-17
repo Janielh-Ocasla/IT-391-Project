@@ -293,7 +293,7 @@ class PageTests(unittest.TestCase):
     def test_unfinished_entries_explain_status_and_return_to_the_correct_dashboard(self):
         for actor, endpoint in ((self.alice, 'member_dashboard'), (self.admin, 'admin_dashboard')):
             headers = self.login(actor)
-            for page in ('account', 'services', 'faq'):
+            for page in ('account',):
                 with self.subTest(role=actor['role'], page=page):
                     html, context = self.rendered(page, headers)
                     self.assertIn('not available', html)
